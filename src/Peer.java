@@ -36,7 +36,8 @@ public class Peer implements RemotePeerStub {
                     retVal = LocateRegistry.createRegistry(1077);
                     Peer first = new Peer(host);
                     RemotePeerStub _first = stub(first);
-                    retVal.bind("bootstrap", _first);
+                    retVal.bind(Constants.BOOTSTRAP, _first);
+
                     System.out.println("Boostrap node bound, listening to nodes...");
                 }
                 else {
@@ -56,7 +57,10 @@ public class Peer implements RemotePeerStub {
                         System.out.println("Could not initialize RMI registry...exiting...");
                         System.exit(1);
                     }
-                    String host = java.net.InetAddress.getLocalHost().toString();
+
+                    RemotePeerStub test = find(Constants.BOOTSTRAP);
+                    System.out.println(test.sayHi());
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
