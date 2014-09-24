@@ -1,18 +1,20 @@
 import rmi.RemotePeerStub;
 
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
+
 /**
  * Created by Ahmed Alabdullah on 9/23/14.
  */
 public class Peer implements RemotePeerStub {
 
-
+    public static String bootstrapNode = "compute-0-1";
     private String name;
     public static Registry rmi;
     public static Scanner scanner = new Scanner(System.in);
@@ -24,12 +26,24 @@ public class Peer implements RemotePeerStub {
         this.name = name;
     }
 
-    public static Registry initRegistry() throws UnknownHostException, RemoteException {
+    public static Registry initRegistry() throws UnknownHostException, RemoteException, AlreadyBoundException {
         Registry retVal = null;
-        String host = java.net.InetAddress.getLocalHost().toString();
+        String host = java.net.InetAddress.getLocalHost().toString().split(".local")[0];
         System.out.println("host is " + host);
         System.setProperty("java.rmi.server.hostname", host);
-        retVal = LocateRegistry.createRegistry(1077);
+
+                if (bootstrapNode.equals(host)) {
+                    retVal = LocateRegistry.createRegistry(1077);
+                    Peer first = new Peer(host);
+                    RemotePeerStub _first = stub(first);
+                    retVal.bind("bootstrap", _first);
+                    System.out.println("Boostrap node bound, listening to nodes...");
+                }
+                else {
+                    retVal = LocateRegistry.getRegistry(bootstrapNode,1077);
+                    System.out.println("Connected " + host + " to network...");
+                }
+
         return retVal;
     }
 
@@ -41,7 +55,9 @@ public class Peer implements RemotePeerStub {
                 System.exit(0);
             }
 
-            if (Constants.BOOTSTRAP.equals(args[0])) {
+
+
+
                 try {
                     rmi = initRegistry();
                     if (rmi == null) {
@@ -49,14 +65,11 @@ public class Peer implements RemotePeerStub {
                         System.exit(1);
                     }
                     String host = java.net.InetAddress.getLocalHost().toString();
-                    Peer first = new Peer(host);
-                    RemotePeerStub _first = stub(first);
-                    rmi.bind("bootstrap", _first);
-                    System.out.println("Boostrap node bound, listening to nodes...");
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
+
 
         System.out.print(">>");
         String command = scanner.next();
