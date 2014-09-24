@@ -15,11 +15,12 @@ import java.util.Scanner;
  */
 public class Peer implements RemotePeerStub {
 
+    private CoordinateZone zone;
     public static String bootstrapNode = "compute-0-1";
     private String name;
     public static Registry rmi;
     public static Scanner scanner = new Scanner(System.in);
-
+    private static String host;
     //public static String prefix = "compute-0-";
 
 
@@ -29,7 +30,7 @@ public class Peer implements RemotePeerStub {
 
     public static Registry initRegistry() throws UnknownHostException, RemoteException, AlreadyBoundException {
         Registry retVal = null;
-        String host = java.net.InetAddress.getLocalHost().toString().split(".local")[0];
+        host = java.net.InetAddress.getLocalHost().toString().split(".local")[0];
         System.out.println("host is " + host);
         System.setProperty("java.rmi.server.hostname", host);
 
@@ -61,6 +62,7 @@ public class Peer implements RemotePeerStub {
 
                     RemotePeerStub test = find(Constants.BOOTSTRAP);
                     System.out.println(test.sayHi());
+                    test.send("Hi from me " + host);
 
 
                 } catch (Exception e) {
@@ -84,6 +86,11 @@ public class Peer implements RemotePeerStub {
     @Override
     public String sayHi() throws RemoteException {
         return name;
+    }
+
+    @Override
+    public void send(String msg) {
+        System.out.println(msg);
     }
 }
 

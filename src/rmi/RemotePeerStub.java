@@ -10,5 +10,6 @@ public interface RemotePeerStub extends Remote {
 
 
     public String sayHi() throws RemoteException;
+    public void send(String msg);
 
 }
