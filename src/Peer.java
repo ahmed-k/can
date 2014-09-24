@@ -6,11 +6,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
-
 /**
  * Created by Ahmed Alabdullah on 9/23/14.
  */
 public class Peer implements RemotePeerStub {
+
 
     private String name;
     public static Registry rmi;
@@ -35,7 +35,7 @@ public class Peer implements RemotePeerStub {
 
     public static void main(String[] args) {
 
-            if ("boostrap".equals(args[0])) {
+            if (Constants.BOOTSTRAP.equals(args[0])) {
                 try {
                     rmi = initRegistry();
                     if (rmi == null) {
