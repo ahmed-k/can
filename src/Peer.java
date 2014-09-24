@@ -1,6 +1,7 @@
 import rmi.RemotePeerStub;
 
 import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -14,7 +15,7 @@ public class Peer implements RemotePeerStub {
 
     private String name;
     public static Registry rmi;
-    public static Scanner scanner;
+    public static Scanner scanner = new Scanner(System.in);
 
     //public static String prefix = "compute-0-";
 
@@ -56,6 +57,14 @@ public class Peer implements RemotePeerStub {
         String command = scanner.next();
         if ("join".equals(command)) {
 
+            try {
+                rmi = LocateRegistry.getRegistry("compute-0-1", 1077);
+                RemotePeerStub _f = find(Constants.BOOTSTRAP);
+                String hi = _f.sayHi();
+                System.out.println(hi);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
 
@@ -63,6 +72,9 @@ public class Peer implements RemotePeerStub {
 
     }
 
+    public static RemotePeerStub find(String node) throws RemoteException, NotBoundException {
+        return (RemotePeerStub) rmi.lookup(node);
+    }
 
     public static RemotePeerStub stub(Peer peer) throws RemoteException {
         return (RemotePeerStub) UnicastRemoteObject.exportObject(peer, 1077);
