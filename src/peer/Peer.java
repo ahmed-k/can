@@ -1,3 +1,5 @@
+package peer;
+
 import rmi.RemotePeerStub;
 
 import java.net.UnknownHostException;
@@ -8,7 +10,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
-
 /**
  * Created by Ahmed Alabdullah on 9/23/14.
  */
