@@ -36,6 +36,11 @@ public class Peer implements RemotePeerStub {
 
     public static void main(String[] args) {
 
+            if (args.length == 0 ) {
+                System.out.println("Usage: ") ;
+                System.exit(0);
+            }
+
             if (Constants.BOOTSTRAP.equals(args[0])) {
                 try {
                     rmi = initRegistry();
