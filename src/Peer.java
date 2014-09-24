@@ -50,14 +50,6 @@ public class Peer implements RemotePeerStub {
 
     public static void main(String[] args) {
 
-            if (args.length == 0 ) {
-                System.out.println("Usage: ") ;
-                System.exit(0);
-            }
-
-
-
-
                 try {
                     rmi = initRegistry();
                     if (rmi == null) {
@@ -71,20 +63,6 @@ public class Peer implements RemotePeerStub {
                 }
 
 
-        System.out.print(">>");
-        String command = scanner.next();
-        if ("join".equals(command)) {
-
-            try {
-                rmi = LocateRegistry.getRegistry("compute-0-1", 1077);
-                RemotePeerStub _f = find(Constants.BOOTSTRAP);
-                String hi = _f.sayHi();
-                System.out.println(hi);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
 
 
 
