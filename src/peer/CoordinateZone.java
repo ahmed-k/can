@@ -1,9 +1,11 @@
 package peer;
 
+import java.io.Serializable;
+
 /**
  * Created by Ahmed Alabdullah on 9/24/14.
  */
-public class CoordinateZone {
+public class CoordinateZone implements Serializable {
 
 
         private float findCenter(Point start, Point end) {

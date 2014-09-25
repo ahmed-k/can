@@ -1,9 +1,11 @@
 package peer;
 
+import java.io.Serializable;
+
 /**
  * Created by Ahmed Alabdullah on 9/25/14.
  */
-public class Point {
+public class Point implements Serializable{
 
 
     public float distanceTo(Point point ) {
