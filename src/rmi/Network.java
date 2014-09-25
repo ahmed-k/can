@@ -29,11 +29,12 @@ public class Network {
         return java.net.InetAddress.getLocalHost().toString().split(".local")[0];
     }
 
-    public static void initHost() throws UnknownHostException {
+    public static String initHost() throws UnknownHostException {
 
         String  host = getHost();
         System.out.println("host is " + host);
         System.setProperty("java.rmi.server.hostname", host);
+        return host;
 
     }
 

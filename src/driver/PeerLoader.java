@@ -31,7 +31,7 @@ public class PeerLoader  {
     //public static String prefix = "compute-0-";
 
     private static void init() throws UnknownHostException, AlreadyBoundException, RemoteException {
-        Network.initHost();
+        host = Network.initHost();
         rmi = Network.initRegistry(host);
         connect();
 
