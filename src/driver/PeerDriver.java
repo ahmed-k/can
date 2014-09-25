@@ -5,6 +5,7 @@ import peer.Point;
 import rmi.Network;
 import rmi.RemotePeerStub;
 
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -22,7 +23,7 @@ public class PeerDriver {
 
     public static Scanner scanner = new Scanner(System.in);
     public static Registry rmi;
-    public static void main(String[] args) throws RemoteException, NotBoundException {
+    public static void main(String[] args) throws RemoteException, NotBoundException, UnknownHostException {
 
 
         try {
@@ -58,7 +59,7 @@ public class PeerDriver {
 
     }
 
-    private static void join(String peerId) throws RemoteException, NotBoundException {
+    private static void join(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
 
         RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
         RemotePeerStub peer = getPeer(peerId);
@@ -71,7 +72,8 @@ public class PeerDriver {
     }
 
 
-    private static RemotePeerStub getPeer(String peerName) throws RemoteException, NotBoundException {
+    private static RemotePeerStub getPeer(String peerName) throws RemoteException, NotBoundException, UnknownHostException {
+        rmi = Network.getRegistry(peerName);
         return (RemotePeerStub) rmi.lookup(peerName);
     }
 

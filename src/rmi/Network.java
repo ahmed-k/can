@@ -7,8 +7,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import static debris.Constants.BOOTSTRAP;
-
 /**
  * Created by Ahmed Alabdullah on 9/25/14.
  */
@@ -16,12 +14,28 @@ public class Network {
 
     private static Registry rmi;
 
-    public static Registry getRegistry() throws RemoteException {
+    public static Registry getRegistry() throws RemoteException, UnknownHostException {
 
-        return LocateRegistry.getRegistry(BOOTSTRAP, 1077);
+        return LocateRegistry.getRegistry(Network.getHost(), 1077);
 
     }
 
+    public static Registry getRegistry(String host) throws RemoteException, UnknownHostException {
+
+        return LocateRegistry.getRegistry(host, 1077);
+    }
+
+    public static String getHost() throws UnknownHostException {
+        return java.net.InetAddress.getLocalHost().toString().split(".local")[0];
+    }
+
+    public static void initHost() throws UnknownHostException {
+
+        String  host = getHost();
+        System.out.println("host is " + host);
+        System.setProperty("java.rmi.server.hostname", host);
+
+    }
 
 
 
@@ -29,14 +43,9 @@ public class Network {
         Registry retVal = null;
 
 
-        if (BOOTSTRAP.equals(host)) {
+
             retVal = LocateRegistry.createRegistry(1077);
 
-        }
-        else {
-            retVal = LocateRegistry.getRegistry(BOOTSTRAP,1077);
-
-        }
 
         if (retVal == null) {
             System.out.println("Could not initialize RMI registry...exiting...");

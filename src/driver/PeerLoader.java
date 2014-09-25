@@ -31,16 +31,15 @@ public class PeerLoader  {
     //public static String prefix = "compute-0-";
 
     private static void init() throws UnknownHostException, AlreadyBoundException, RemoteException {
-        host = java.net.InetAddress.getLocalHost().toString().split(".local")[0];
-        System.out.println("host is " + host);
-        System.setProperty("java.rmi.server.hostname", host);
-        initRegistry();
+        Network.initHost();
+        rmi = Network.initRegistry(host);
+        connect();
 
     }
 
-    private static void initRegistry() throws UnknownHostException, AlreadyBoundException, RemoteException {
+    private static void connect() throws UnknownHostException, AlreadyBoundException, RemoteException {
 
-        rmi = Network.initRegistry(host);
+
         RemotePeerStub _peer = null;
         if (BOOTSTRAP.equals(host)) {
 
@@ -61,7 +60,7 @@ public class PeerLoader  {
 
 
         rmi.bind(host, _peer);
-        System.out.println("Connected " + host + " to network...");
+        System.out.println( host + " is online...");
 
     }
 
