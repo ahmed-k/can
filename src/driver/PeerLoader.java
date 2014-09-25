@@ -1,7 +1,10 @@
 package driver;
 
 
+import peer.BootstrapPeer;
+import peer.CoordinateZone;
 import peer.Peer;
+import peer.Point;
 import rmi.Network;
 import rmi.RemotePeerStub;
 
@@ -10,7 +13,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
-
+import static debris.Constants.*;
 import static peer.Peer.stub;
 
 
@@ -38,8 +41,25 @@ public class PeerLoader  {
     private static void initRegistry() throws UnknownHostException, AlreadyBoundException, RemoteException {
 
         rmi = Network.initRegistry(host);
-        Peer peer = new Peer(host);
-        RemotePeerStub _peer = stub(peer);
+        RemotePeerStub _peer = null;
+        if (BOOTSTRAP.equals(host)) {
+
+            BootstrapPeer bootstrapPeer = new BootstrapPeer(host);
+            _peer = stub(bootstrapPeer);
+            bootstrapPeer.setStub(_peer);
+            bootstrapPeer.addOnlineNode(_peer);
+            bootstrapPeer.setZone(new CoordinateZone(new Point(0,0), new Point(0,UNIVERSE), new Point(UNIVERSE,0), new Point(UNIVERSE,UNIVERSE)));
+
+        }
+
+        else {
+            Peer peer = new Peer(host);
+            _peer = stub(peer);
+            peer.setStub(_peer);
+        }
+
+
+
         rmi.bind(host, _peer);
         System.out.println("Connected " + host + " to network...");
 

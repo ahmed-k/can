@@ -15,11 +15,9 @@ public interface RemotePeerStub extends Remote {
     public String sayHi() throws RemoteException;
     public void send(String msg) throws RemoteException;
 
-    List<RemotePeerStub> findAvailableNodes() throws RemoteException;
     Point pickRandomPoint() throws RemoteException;
-
     RemotePeerStub route(Point randomPoint) throws RemoteException;
     void splitZone(RemotePeerStub peer) throws RemoteException;
-
     Float calculateProximityTo(Point randomPoint)throws RemoteException;
+    List<RemotePeerStub> findAvailableNodes() throws RemoteException;
 }

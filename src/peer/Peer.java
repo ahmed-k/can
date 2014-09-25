@@ -6,32 +6,20 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-import static debris.Constants.BOOTSTRAP;
-import static debris.Constants.UNIVERSE;
-
 /**
  * Created by Ahmed Alabdullah on 9/23/14.
  */
 public class Peer implements RemotePeerStub {
 
 
-    private CoordinateZone zone;
-    private String name;
-    private RemotePeerStub stub;
-    private List<RemotePeerStub> neighbors = new ArrayList<RemotePeerStub>();
-    private List<RemotePeerStub> onlineNodes = new ArrayList<RemotePeerStub>();
+    protected CoordinateZone zone;
+    protected String name;
+    protected RemotePeerStub stub;
+    protected List<RemotePeerStub> neighbors = new ArrayList<RemotePeerStub>();
+
 
     public Peer(String name) {
-        if(BOOTSTRAP.equals(name)) {
-            this.setZone(new CoordinateZone(new Point(0,0), new Point(0,UNIVERSE), new Point(UNIVERSE,0), new Point(UNIVERSE,UNIVERSE)));
 
-            try {
-                stub = stub(this);
-                onlineNodes.add(stub);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
         this.name = name;
     }
 
@@ -50,10 +38,7 @@ public class Peer implements RemotePeerStub {
         System.out.println(msg);
     }
 
-    @Override
-    public List<RemotePeerStub> findAvailableNodes() {
-        return onlineNodes;
-    }
+
 
     public CoordinateZone getZone() {
         return zone;
@@ -91,6 +76,11 @@ public class Peer implements RemotePeerStub {
         return zone.distanceFromCenterTo(randomPoint);
     }
 
+    @Override
+    public List<RemotePeerStub> findAvailableNodes() throws RemoteException {
+        return null;
+    }
+
 
     @Override
     public void splitZone(RemotePeerStub peer) throws RemoteException {
@@ -107,7 +97,9 @@ public class Peer implements RemotePeerStub {
     }
 
 
-
+    public void setStub(RemotePeerStub stub) {
+        this.stub = stub;
+    }
 }
 
 
