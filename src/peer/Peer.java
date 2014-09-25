@@ -2,85 +2,45 @@ package peer;
 
 import rmi.RemotePeerStub;
 
-import java.net.UnknownHostException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Scanner;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
+
+import static debris.Constants.BOOTSTRAP;
+import static debris.Constants.UNIVERSE;
+
 /**
  * Created by Ahmed Alabdullah on 9/23/14.
  */
 public class Peer implements RemotePeerStub {
 
-    private CoordinateZone zone;
-    public static String bootstrapNode = "compute-0-1";
-    private String name;
-    public static Registry rmi;
-    public static Scanner scanner = new Scanner(System.in);
-    private static String host;
-    //public static String prefix = "compute-0-";
 
+    private CoordinateZone zone;
+    private String name;
+    private RemotePeerStub stub;
+    private List<RemotePeerStub> neighbors;
+    private List<RemotePeerStub> onlineNodes;
 
     public Peer(String name) {
+        if(BOOTSTRAP.equals(name)) {
+            this.setZone(new CoordinateZone(new Point(0,0), new Point(0,UNIVERSE), new Point(UNIVERSE,0), new Point(UNIVERSE,UNIVERSE)));
+
+            try {
+                stub = stub(this);
+                onlineNodes.add(stub);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
         this.name = name;
     }
 
-    public static Registry initRegistry() throws UnknownHostException, RemoteException, AlreadyBoundException {
-        Registry retVal = null;
-        host = java.net.InetAddress.getLocalHost().toString().split(".local")[0];
-        System.out.println("host is " + host);
-        System.setProperty("java.rmi.server.hostname", host);
-
-                if (bootstrapNode.equals(host)) {
-                    retVal = LocateRegistry.createRegistry(1077);
-                    Peer first = new Peer(host);
-                    RemotePeerStub _first = stub(first);
-                    retVal.bind(Constants.BOOTSTRAP, _first);
-
-                    System.out.println("Boostrap node bound, listening to nodes...");
-                }
-                else {
-                    retVal = LocateRegistry.getRegistry(bootstrapNode,1077);
-                    System.out.println("Connected " + host + " to network...");
-                }
-
-        return retVal;
-    }
-
-
-    public static void main(String[] args) {
-
-                try {
-                    rmi = initRegistry();
-                    if (rmi == null) {
-                        System.out.println("Could not initialize RMI registry...exiting...");
-                        System.exit(1);
-                    }
-
-                    RemotePeerStub test = find(Constants.BOOTSTRAP);
-                    System.out.println(test.sayHi());
-                    test.send("Hi from me " + host);
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
-
-
-
-    }
-
-    public static RemotePeerStub find(String node) throws RemoteException, NotBoundException {
-        return (RemotePeerStub) rmi.lookup(node);
-    }
-
-    public static RemotePeerStub stub(Peer peer) throws RemoteException {
-        return (RemotePeerStub) UnicastRemoteObject.exportObject(peer, 1077);
+    public Peer(String name, CoordinateZone zone) {
+        this.name = name;
+        this.zone = zone;
     }
 
     @Override
@@ -92,6 +52,65 @@ public class Peer implements RemotePeerStub {
     public void send(String msg) {
         System.out.println(msg);
     }
+
+    @Override
+    public List<RemotePeerStub> findAvailableNodes() {
+        return onlineNodes;
+    }
+
+    public CoordinateZone getZone() {
+        return zone;
+    }
+
+    public void setZone(CoordinateZone zone) {
+        this.zone = zone;
+    }
+
+    public static RemotePeerStub stub(Peer peer) throws RemoteException {
+        return (RemotePeerStub) UnicastRemoteObject.exportObject(peer, 1077);
+    }
+
+    public Point pickRandomPoint() throws RemoteException{
+        Random r = new Random();
+        float x = r.nextInt(10);
+        float y = r.nextInt(10);
+        return new Point(x,y);
+
+    }
+
+    @Override
+    public RemotePeerStub route(Point randomPoint) throws RemoteException {
+        if ( zone.hasPoint(randomPoint) ) {
+            return stub;
+        }
+        else {
+            return routeToClosestNeighbor(randomPoint);
+        }
+
+    }
+
+    @Override
+    public Float calculateProximityTo(Point randomPoint) {
+        return zone.distanceFromCenterTo(randomPoint);
+    }
+
+
+    @Override
+    public void splitZone(RemotePeerStub peer) throws RemoteException {
+
+    }
+
+    private RemotePeerStub routeToClosestNeighbor(Point randomPoint) throws RemoteException {
+        Map<Float, RemotePeerStub> proximity = new TreeMap<Float, RemotePeerStub>();
+        for (RemotePeerStub neighbor : neighbors) {
+            proximity.put(neighbor.calculateProximityTo(randomPoint), neighbor);
+        }
+        RemotePeerStub closestNeighbor = proximity.get(0);
+        return closestNeighbor.route(randomPoint);
+    }
+
+
+
 }
 
 
