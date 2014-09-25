@@ -60,12 +60,14 @@ public class PeerDriver {
     }
 
     private static void join(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
-
+        System.out.println("Executing JOIN request...");
         RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
         RemotePeerStub peer = getPeer(peerId);
         List<RemotePeerStub> onlineNodes = bootstrap.findAvailableNodes();
         Point randomPoint = peer.pickRandomPoint();
+        System.out.println("Picked random point: " + randomPoint);
         RemotePeerStub router = pickRandomOnlineNode(onlineNodes);
+        System.out.println("Picked random online node: " + router.desc());
         RemotePeerStub pointOwner = router.route(randomPoint);
         pointOwner.splitZone(peer);
 

@@ -81,6 +81,11 @@ public class Peer implements RemotePeerStub {
         return null;
     }
 
+    @Override
+    public String desc() throws RemoteException {
+        return name + " : " + zone.toString();
+    }
+
 
     @Override
     public void splitZone(RemotePeerStub peer) throws RemoteException {

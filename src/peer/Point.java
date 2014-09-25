@@ -41,4 +41,8 @@ public class Point implements Serializable{
     public void setY(float y) {
         this.y = y;
     }
+
+    public String toString() {
+        return "(" + x + "," + y + ")";
+    }
 }
