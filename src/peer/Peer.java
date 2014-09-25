@@ -4,10 +4,7 @@ import rmi.RemotePeerStub;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 import static debris.Constants.BOOTSTRAP;
 import static debris.Constants.UNIVERSE;
@@ -21,8 +18,8 @@ public class Peer implements RemotePeerStub {
     private CoordinateZone zone;
     private String name;
     private RemotePeerStub stub;
-    private List<RemotePeerStub> neighbors;
-    private List<RemotePeerStub> onlineNodes;
+    private List<RemotePeerStub> neighbors = new ArrayList<RemotePeerStub>();
+    private List<RemotePeerStub> onlineNodes = new ArrayList<RemotePeerStub>();
 
     public Peer(String name) {
         if(BOOTSTRAP.equals(name)) {
