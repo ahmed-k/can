@@ -96,8 +96,8 @@ public class Peer implements RemotePeerStub {
         System.out.println ("zone split and now has dimensions: " + zone) ;
         System.out.println ("new zone has dimensions" + newZone);
         List<RemotePeerStub> departingNeighbors = removeDepartingNeighbors(zone);
+        departingNeighbors.add(stub);
         this.welcomeNewNeighbor(peer);
-        peer.welcomeNewNeighbor(stub);
         peer.accept(newZone, departingNeighbors);
         System.out.println("node " + name + " has neighbors: " + neighbors());
 
