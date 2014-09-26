@@ -15,6 +15,7 @@ import java.util.Scanner;
 
 import static debris.Command.INSERT;
 import static debris.Command.SEARCH;
+import static debris.Command.LEAVE;
 import static debris.Command.JOIN;
 import static debris.Constants.BOOTSTRAP;
 
@@ -61,6 +62,11 @@ public class P2PDriver {
 
                         search(keyword, peerId);
 
+                    }
+
+                    if (command == LEAVE) {
+                        String peerId = scanner.next();
+                        leave(peerId);
                     }
 
 
