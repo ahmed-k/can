@@ -18,9 +18,11 @@ public class CoordinateZone implements Serializable {
 
         public float distanceFromCenterTo(Point point) {
             float centerX = findCenter(xStart, xEnd);
-            float centerY = findCenter(yStart, yEnd);
 
-            return point.distanceTo(new Point(centerX, centerY));
+            float centerY = findCenter(yStart, yEnd);
+            Point centroid = new Point(centerX, centerY);
+            System.out.println("zone center is " + centroid);
+            return point.distanceTo(centroid);
 
         }
 

@@ -34,10 +34,11 @@ public class P2PDriver {
             e.printStackTrace();
         }
         System.out.println("You have connected to the P2P network..");
-        System.out.println("Please enter a command");
-        System.out.print(">>");
+
         Command command = null;
             while (true) {
+                System.out.println("Please enter a command");
+                System.out.print(">>");
                 try {
                     command = Command.valueOf(scanner.next().toUpperCase());
                     if (command == INSERT) {
@@ -115,6 +116,7 @@ public class P2PDriver {
     private static void insert(String keyword, String peerId) throws RemoteException, NotBoundException, UnknownHostException {
         System.out.println("Executing INSERT request...");
         Point insertionPoint = resolve(keyword);
+        System.out.println(keyword + " resolved as " + insertionPoint);
         RemotePeerStub peer = getPeer(peerId);
         peer.insert(insertionPoint, keyword);
 

@@ -189,11 +189,11 @@ public class Peer implements RemotePeerStub {
 
 
     private RemotePeerStub routeToClosestNeighbor(Point randomPoint) throws RemoteException {
-        Map<Float, RemotePeerStub> proximity = new TreeMap<Float, RemotePeerStub>();
+        SortedMap<Float, RemotePeerStub> proximity = new TreeMap<Float, RemotePeerStub>();
         for (RemotePeerStub neighbor : neighbors) {
             proximity.put(neighbor.calculateProximityTo(randomPoint), neighbor);
         }
-        RemotePeerStub closestNeighbor = proximity.get(0);
+        RemotePeerStub closestNeighbor = proximity.get(proximity.firstKey());
         return closestNeighbor.route(randomPoint);
     }
 
