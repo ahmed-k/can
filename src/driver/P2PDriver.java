@@ -141,7 +141,7 @@ public class P2PDriver {
                 odd += arr[i];
             }
         }
-        return new Point(odd,even);
+        return new Point(odd % 10 ,even % 10);
     }
 
     private static RemotePeerStub pickRandomOnlineNode(List<RemotePeerStub> nodes) {
