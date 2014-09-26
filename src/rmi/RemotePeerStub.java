@@ -43,4 +43,8 @@ public interface RemotePeerStub extends Remote {
     boolean willMergeUniformly(CoordinateZone zone) throws RemoteException;
 
     void own(CoordinateZone zone, java.util.Map hashtable) throws RemoteException;
+
+    void removeOnlineNode(RemotePeerStub peer) throws RemoteException;
+
+    String toString() throws RemoteException;
 }

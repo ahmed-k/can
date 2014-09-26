@@ -11,19 +11,12 @@ public class CoordinateZone implements Serializable {
 
         List<CoordinateZone> subzones = new ArrayList<CoordinateZone>();
 
-        private float findCenter(Point start, Point end) {
 
-            float dist = end.distanceTo(start);
-            return dist/2;
-
-
-        }
 
         public float distanceFromCenterTo(Point point) {
-            float centerX = findCenter(xStart, xEnd);
-
-            float centerY = findCenter(yStart, yEnd);
-            Point centroid = new Point(centerX, centerY);
+            Point centroidX  = new Line(xStart, xEnd).findCenter();
+            Point centroidY = new Line(yStart, yEnd).findCenter();
+            Point centroid = new Point(centroidX.getX(), centroidY.getY());
             System.out.println("zone center is " + centroid);
             return point.distanceTo(centroid);
 
@@ -62,13 +55,18 @@ public class CoordinateZone implements Serializable {
 
     public boolean hasPoint(Point randomPoint) {
 
-        float x2 = randomPoint.getX();
-        float y2 = randomPoint.getY();
+        float x = randomPoint.getX();
+        float y = randomPoint.getY();
 
-        float x1 = xStart.getX();
-        float y1 = xEnd.getY();
+        float xRangeBegin = xStart.getX();
+        float xRangeEnd = yStart.getX();
+        float yRangeBegin = xStart.getY();
+        float yRangeEnd = xEnd.getY();
+        boolean withinX = ( xRangeBegin <= x && x <= xRangeEnd );
+        boolean withinY = ( yRangeBegin <= y && y <= yRangeEnd );
 
-        boolean hasIt = (x1 <= x2 ) && ( y2 <= y1 );
+
+        boolean hasIt = (withinX && withinY );
 
         if (!hasIt) {
             for (CoordinateZone zone : subzones) {
@@ -96,9 +94,9 @@ public class CoordinateZone implements Serializable {
     }
 
     public CoordinateZone splitVertically() {
-        float x = findCenter(xStart, yStart);
-        Point newYStart = new Point(x, xStart.getY());
-        Point newYEnd = new Point (x, xEnd.getY());
+        Point centroid = new Line(xStart, yStart).findCenter();
+        Point newYStart = centroid;
+        Point newYEnd = new Point (centroid.getX(), xEnd.getY());
         CoordinateZone retVal = new CoordinateZone(newYStart, newYEnd, yStart, yEnd);
         yStart = newYStart;
         yEnd = newYEnd;
@@ -106,10 +104,10 @@ public class CoordinateZone implements Serializable {
     }
 
     public CoordinateZone splitHorizontally() {
-        float y = findCenter(xStart, xEnd);
-        Point newXEnd = new Point(xStart.getX(), y);
-        Point newYEnd = new Point(xEnd.getX(), y);
-        CoordinateZone retVal = new CoordinateZone(xStart, newXEnd, yStart, newYEnd);
+        Point centroid = new Line(xStart, xEnd).findCenter();
+        Point newXEnd = new Point(xStart.getX(), centroid.getY());
+        Point newYEnd = new Point(yStart.getX(), centroid.getY());
+        CoordinateZone retVal = new CoordinateZone(newXEnd, xEnd, newYEnd, yEnd);
         xEnd = newXEnd;
         yEnd = newYEnd;
         return retVal;
@@ -118,7 +116,7 @@ public class CoordinateZone implements Serializable {
 
     public CoordinateZone splitInHalf() {
         CoordinateZone retVal = null;
-        if (isSquare()) {
+        if (isSquare() || (xStart.distanceTo(yStart) > xStart.distanceTo(xEnd)) ) {
             retVal = splitVertically();
         }
         else {

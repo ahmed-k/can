@@ -20,12 +20,12 @@ public class Peer implements RemotePeerStub {
     protected String ip;
     protected RemotePeerStub stub;
     protected List<RemotePeerStub> neighbors = new ArrayList<RemotePeerStub>();
-    protected Map<String, String> hashtable = new Hashtable<String,String>();
+    protected Map<String, String> hashtable = new Hashtable<String, String>();
 
     public Peer(String name, String ip) {
 
         this.name = name;
-        this.ip= ip;
+        this.ip = ip;
     }
 
     public Peer(String name, CoordinateZone zone) {
@@ -44,7 +44,6 @@ public class Peer implements RemotePeerStub {
     }
 
 
-
     public CoordinateZone getZone() {
         return zone;
     }
@@ -57,21 +56,20 @@ public class Peer implements RemotePeerStub {
         return (RemotePeerStub) UnicastRemoteObject.exportObject(peer, 1077);
     }
 
-    public Point pickRandomPoint() throws RemoteException{
+    public Point pickRandomPoint() throws RemoteException {
         Random r = new Random();
         float x = r.nextInt(10);
         float y = r.nextInt(10);
-        return new Point(x,y);
+        return new Point(x, y);
 
     }
 
     @Override
     public RemotePeerStub route(Point randomPoint) throws RemoteException {
-        if ( zone.hasPoint(randomPoint) ) {
+        if (zone.hasPoint(randomPoint)) {
             System.out.println(name + " has the point!");
             return stub;
-        }
-        else {
+        } else {
             return routeToClosestNeighbor(randomPoint);
         }
 
@@ -94,15 +92,14 @@ public class Peer implements RemotePeerStub {
 
     @Override
     public void accomodate(RemotePeerStub peer, Point peerPoint) throws RemoteException {
-        CoordinateZone newZone= null;
+        CoordinateZone newZone = null;
         if (zone.inASubZone(peerPoint)) {
             newZone = zone.getSubzoneOwning(peerPoint);
+        } else {
+            newZone = zone.splitInHalf();
         }
-        else {
-            newZone =  zone.splitInHalf();
-        }
-        System.out.println ("zone split and now has dimensions: " + zone) ;
-        System.out.println ("new zone has dimensions" + newZone);
+        System.out.println("zone split and now has dimensions: " + zone);
+        System.out.println("new zone has dimensions" + newZone);
         List<RemotePeerStub> departingNeighbors = removeDepartingNeighbors(zone);
         departingNeighbors.add(stub);
         this.welcomeNewNeighbor(peer);
@@ -123,7 +120,7 @@ public class Peer implements RemotePeerStub {
 
     private List<RemotePeerStub> removeDepartingNeighbors(CoordinateZone zone) throws RemoteException {
         List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
-        for (RemotePeerStub neighbor: neighbors) {
+        for (RemotePeerStub neighbor : neighbors) {
             if (neighbor.noLongerANeighbor(zone)) {
                 System.out.println("Neighbor " + neighbor.desc() + " no longer a neighbor!");
                 neighbor.notifyDeparture(stub);
@@ -153,7 +150,7 @@ public class Peer implements RemotePeerStub {
 
     @Override
     public void welcomeNewNeighbor(RemotePeerStub neighbor) throws RemoteException {
-        if (!neighbors.contains(neighbor)){
+        if (!neighbors.contains(neighbor)) {
             neighbors.add(neighbor);
         }
 
@@ -169,10 +166,9 @@ public class Peer implements RemotePeerStub {
         if (zone.hasPoint(insertionPoint)) {
             System.out.println("keyword " + keyword + " stored in " + name);
             hashtable.put(keyword, "file represented by " + keyword);
-        }
-        else {
+        } else {
             RemotePeerStub closest = routeToClosestNeighbor(insertionPoint);
-            System.out.println (" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
+            System.out.println(" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
             closest.insert(insertionPoint, keyword);
         }
 
@@ -187,10 +183,9 @@ public class Peer implements RemotePeerStub {
     public void search(Point insertionPoint, String keyword) throws RemoteException {
         if (zone.hasPoint(insertionPoint)) {
             System.out.println("Found at peer " + name + " with IP " + ip);
-        }
-        else {
+        } else {
             RemotePeerStub closest = routeToClosestNeighbor(insertionPoint);
-            System.out.println (" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
+            System.out.println(" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
             closest.search(insertionPoint, keyword);
         }
     }
@@ -208,8 +203,7 @@ public class Peer implements RemotePeerStub {
                 merge(neighbor);
                 Logger.log("Successfully merged with" + neighbor.desc());
                 return Logger.deliverLog();
-            }
-            else {
+            } else {
                 size.put(neighbor.zoneSize(), neighbor);
             }
         }
@@ -245,6 +239,11 @@ public class Peer implements RemotePeerStub {
         this.hashtable.putAll(hashtable);
     }
 
+    @Override
+    public void removeOnlineNode(RemotePeerStub peer) throws RemoteException {
+
+    }
+
     private RemotePeerStub routeToClosestNeighbor(Point randomPoint) throws RemoteException {
         SortedMap<Float, RemotePeerStub> proximity = new TreeMap<Float, RemotePeerStub>();
         for (RemotePeerStub neighbor : neighbors) {
@@ -254,9 +253,30 @@ public class Peer implements RemotePeerStub {
         return closestNeighbor.route(randomPoint);
     }
 
+    private String data() {
+        String retVal = "";
+        for (Map.Entry<String, String> e : hashtable.entrySet()) {
+            retVal += e.getKey() + " => " + e.getValue() + "\n";
+        }
+        return retVal;
+
+    }
 
     public void setStub(RemotePeerStub stub) {
         this.stub = stub;
+    }
+
+    public String toString() {
+        try {
+            return "Peer name: " + name + "\n" +
+                    "IP Address: " + ip + "\n" +
+                    "Zone Coordinate: " + zone + "\n" +
+                    "Neighbors: " + neighbors() + "\n" +
+                    "Data: " + data();
+        } catch (RemoteException e) {
+            return "FAILURE";
+        }
+
     }
 }
 

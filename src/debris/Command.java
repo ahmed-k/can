@@ -4,7 +4,7 @@ package debris;
  * Created by Ahmed Alabdullah on 9/25/14.
  */
 public enum Command {
-    JOIN, LEAVE, INSERT, VIEW, SEARCH;
+    JOIN, LEAVE, INSERT, VIEW, SEARCH, EXIT;
 
 
 

@@ -13,10 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
-import static debris.Command.INSERT;
-import static debris.Command.SEARCH;
-import static debris.Command.LEAVE;
-import static debris.Command.JOIN;
+import static debris.Command.*;
 import static debris.Constants.BOOTSTRAP;
 
 /**
@@ -41,50 +38,80 @@ public class P2PDriver {
                 System.out.println("Please enter a command");
                 System.out.print(">>");
                 try {
-                    command = Command.valueOf(scanner.next().toUpperCase());
-                    if (command == INSERT) {
+                    String[] input = scanner.nextLine().split(" ");
+                    if (input.length > 0) {
+                        command = Command.valueOf(input[0].toUpperCase());
 
-                        String keyword = scanner.next();
-                        String peerId = scanner.next();
-                        while (keyword == null) {
-                            System.out.println("Please specify a keyword...");
-                            keyword = scanner.next();
+                        if (command == EXIT) {
+                            break;
                         }
 
-                        insert(keyword, peerId);
+                        if (command == INSERT) {
+                            if (input.length < 3) {
+                                System.out.println("Usage: INSERT keyword peer");
+                            }
+                            else {
+                                String keyword = input[1];
+                                String peerId = input[2];
+                                insert(keyword, peerId);
+                            }
+
+                        }
+
+                        if (command == SEARCH) {
+                            if (input.length < 3) {
+                                System.out.println("Usage: SEARCH keyword peer");
+                            }
+                            else {
+                                String keyword = input[1];
+                                String peerId = input[2];
+                                search(keyword, peerId);
+                            }
+                        }
+
+                        if (command == LEAVE) {
+                            if (input.length < 2) {
+                                System.out.println("Usage: LEAVE peer");
+                            }
+                            String peerId = input[1];
+                            leave(peerId);
+                        }
+
+                        if (command == VIEW) {
+
+                            if (input.length == 1) {
+                                viewAll();
+                            }
+                            else if (input.length == 2) {
+                                view(input[1]);
+                            }
+                            else {
+                                System.out.println("Usage: VIEW [peer]");
+                            }
+                        }
 
 
+                        if (command == JOIN) {
+                            if (input.length < 1 || input.length > 2) {
+                                System.out.println("Usage: JOIN [peer] ");
+                            }
+                            else if (input.length == 2) {
+                                String peerId = scanner.next();
+                                join(peerId);
+                            }
+
+                            else {
+                                for (int i=2; i<21; i++) {
+                                  join("compute-0-"+i);
+                                }
+                            }
+
+
+
+
+                        }
                     }
-
-                    if (command == SEARCH) {
-                        String keyword = scanner.next();
-                        String peerId = scanner.next();
-
-                        search(keyword, peerId);
-
-                    }
-
-                    if (command == LEAVE) {
-                        String peerId = scanner.next();
-                        leave(peerId);
-                    }
-
-
-
-
-                if (command == JOIN) {
-                    String peerId = scanner.next();
-                    while (peerId == null) {
-                        System.out.println("Please specify a peer...");
-                        peerId = scanner.next();
-
-                    }
-
-                    join(peerId);
-
-
                 }
-            }
                 catch(IllegalArgumentException ex) {
                     System.out.println("Not a valid command...");
                 }
@@ -96,37 +123,68 @@ public class P2PDriver {
 
     }
 
+
+    private static void viewAll() throws RemoteException, NotBoundException, UnknownHostException {
+        RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
+        List<RemotePeerStub> nodes = bootstrap.findAvailableNodes();
+
+        for (RemotePeerStub node: nodes) {
+            System.out.println(node);
+        }
+
+    }
+
+    private static void view(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
+        RemotePeerStub peer = getPeer(peerId);
+        System.out.println(peer);
+
+    }
+
     private static void leave(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
         System.out.println("Executing LEAVE request...");
         RemotePeerStub peer = getPeer(peerId);
         String log = peer.leave();
+        RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
+        bootstrap.removeOnlineNode(peer);
 
     }
 
     private static void join(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
         System.out.println("Executing JOIN request...");
         RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
-        RemotePeerStub peer = getPeer(peerId);
-        List<RemotePeerStub> onlineNodes = bootstrap.findAvailableNodes();
-        boolean alreadyJoined = false;
-        for (RemotePeerStub node: onlineNodes) {
 
-            if (node.ip().equals(peer.ip())) {
-                System.out.println("Peer already part of the network...");
-                alreadyJoined = true;
-                break;
+            RemotePeerStub peer = null;
+        try {
+            peer = getPeer(peerId);
+        }
+        //node not active
+        catch(RemoteException e) {
+            return;
+        }
+
+            List<RemotePeerStub> onlineNodes = bootstrap.findAvailableNodes();
+            boolean alreadyJoined = false;
+            for (RemotePeerStub node: onlineNodes) {
+
+                if (node.ip().equals(peer.ip())) {
+                    System.out.println("Peer already part of the network...");
+                    alreadyJoined = true;
+                    break;
+                }
+
+            }
+            if (!alreadyJoined) {
+                Point randomPoint = peer.pickRandomPoint();
+                System.out.println("Picked random point: " + randomPoint);
+                RemotePeerStub router = pickRandomOnlineNode(onlineNodes);
+                System.out.println("Picked random online node: " + router.desc());
+                RemotePeerStub pointOwnerPeer = router.route(randomPoint);
+                pointOwnerPeer.accomodate(peer, randomPoint);
+                bootstrap.addOnlineNode(peer);
             }
 
-        }
-        if (!alreadyJoined) {
-            Point randomPoint = peer.pickRandomPoint();
-            System.out.println("Picked random point: " + randomPoint);
-            RemotePeerStub router = pickRandomOnlineNode(onlineNodes);
-            System.out.println("Picked random online node: " + router.desc());
-            RemotePeerStub pointOwnerPeer = router.route(randomPoint);
-            pointOwnerPeer.accomodate(peer, randomPoint);
-            bootstrap.addOnlineNode(peer);
-        }
+
+
 
     }
 

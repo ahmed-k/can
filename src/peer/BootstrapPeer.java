@@ -25,5 +25,7 @@ public class BootstrapPeer extends Peer {
         return onlineNodes;
     }
 
-
+    public void removeOnlineNode(RemotePeerStub peer) {
+        onlineNodes.remove(peer);
+    }
 }
