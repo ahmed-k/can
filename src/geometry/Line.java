@@ -28,4 +28,18 @@ public class Line {
     public void setEnd(Point end) {
         this.end = end;
     }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof Line)) {
+            return false;
+        }
+        Line other = (Line)o;
+        Point oStart = other.getStart();
+        Point oEnd = other.getEnd();
+        return oStart.equals(start) && oEnd.equals(end);
+    }
+
+    public int hashCode() {
+        return new Float( start.getX()+start.getY()+end.getX()+end.getY()).intValue();
+    }
 }

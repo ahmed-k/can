@@ -90,17 +90,37 @@ public class P2PDriver {
 
     }
 
+    private static void leave(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
+        System.out.println("Executing LEAVE request...");
+        RemotePeerStub peer = getPeer(peerId);
+        String log = peer.leave();
+
+    }
+
     private static void join(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
         System.out.println("Executing JOIN request...");
         RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
         RemotePeerStub peer = getPeer(peerId);
         List<RemotePeerStub> onlineNodes = bootstrap.findAvailableNodes();
-        Point randomPoint = peer.pickRandomPoint();
-        System.out.println("Picked random point: " + randomPoint);
-        RemotePeerStub router = pickRandomOnlineNode(onlineNodes);
-        System.out.println("Picked random online node: " + router.desc());
-        RemotePeerStub pointOwnerPeer = router.route(randomPoint);
-        pointOwnerPeer.accomodate(peer);
+        boolean alreadyJoined = false;
+        for (RemotePeerStub node: onlineNodes) {
+
+            if (node.ip().equals(peer.ip())) {
+                System.out.println("Peer already part of the network...");
+                alreadyJoined = true;
+                break;
+            }
+
+        }
+        if (!alreadyJoined) {
+            Point randomPoint = peer.pickRandomPoint();
+            System.out.println("Picked random point: " + randomPoint);
+            RemotePeerStub router = pickRandomOnlineNode(onlineNodes);
+            System.out.println("Picked random online node: " + router.desc());
+            RemotePeerStub pointOwnerPeer = router.route(randomPoint);
+            pointOwnerPeer.accomodate(peer, randomPoint);
+            bootstrap.addOnlineNode(peer);
+        }
 
     }
 

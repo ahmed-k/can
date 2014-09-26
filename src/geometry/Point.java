@@ -43,6 +43,19 @@ public class Point implements Serializable{
         this.y = y;
     }
 
+    public boolean equals(Object o) {
+        if (!(o instanceof Point)) {
+            return false;
+        }
+
+        Point other = (Point) o;
+        return other.getX() == x && other.getY() == y;
+    }
+
+    public int hashCode() {
+        return new Float(x+y*17).intValue();
+    }
+
     public String toString() {
         return "(" + x + "," + y + ")";
     }

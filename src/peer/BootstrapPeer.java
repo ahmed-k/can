@@ -17,12 +17,13 @@ public class BootstrapPeer extends Peer {
     }
 
 
+    public void addOnlineNode(RemotePeerStub peer) {
+        onlineNodes.add(peer);
+    }
 
     public List<RemotePeerStub> findAvailableNodes() {
         return onlineNodes;
     }
 
-    public void addOnlineNode(RemotePeerStub peer) {
-        onlineNodes.add(peer);
-    }
+
 }

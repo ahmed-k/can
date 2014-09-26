@@ -21,7 +21,7 @@ public interface RemotePeerStub extends Remote {
     Float calculateProximityTo(Point randomPoint)throws RemoteException;
     List<RemotePeerStub> findAvailableNodes() throws RemoteException;
     String desc() throws RemoteException;
-    void accomodate(RemotePeerStub peer) throws RemoteException;
+    void accomodate(RemotePeerStub peer, Point peerPoint) throws RemoteException;
     void accept(CoordinateZone newZone, List<RemotePeerStub> departingNeighbors) throws RemoteException;
 
     boolean noLongerANeighbor(CoordinateZone zone) throws RemoteException;
@@ -33,4 +33,14 @@ public interface RemotePeerStub extends Remote {
     String ip() throws RemoteException;
 
     void search(Point insertionPoint, String keyword) throws RemoteException;
+
+    void addOnlineNode(RemotePeerStub peer) throws RemoteException;
+
+    String leave() throws RemoteException;
+
+    Float zoneSize() throws RemoteException;
+
+    boolean willMergeUniformly(CoordinateZone zone) throws RemoteException;
+
+    void own(CoordinateZone zone, java.util.Map hashtable) throws RemoteException;
 }

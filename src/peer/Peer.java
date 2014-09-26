@@ -1,5 +1,6 @@
 package peer;
 
+import debris.Logger;
 import geometry.CoordinateZone;
 import geometry.Point;
 import rmi.RemotePeerStub;
@@ -92,9 +93,14 @@ public class Peer implements RemotePeerStub {
     }
 
     @Override
-    public void accomodate(RemotePeerStub peer) throws RemoteException {
-
-        CoordinateZone newZone = zone.splitInHalf();
+    public void accomodate(RemotePeerStub peer, Point peerPoint) throws RemoteException {
+        CoordinateZone newZone= null;
+        if (zone.inASubZone(peerPoint)) {
+            newZone = zone.getSubzoneOwning(peerPoint);
+        }
+        else {
+            newZone =  zone.splitInHalf();
+        }
         System.out.println ("zone split and now has dimensions: " + zone) ;
         System.out.println ("new zone has dimensions" + newZone);
         List<RemotePeerStub> departingNeighbors = removeDepartingNeighbors(zone);
@@ -105,7 +111,6 @@ public class Peer implements RemotePeerStub {
 
 
     }
-
 
     private String neighbors() throws RemoteException {
         String retVal = "";
@@ -148,7 +153,10 @@ public class Peer implements RemotePeerStub {
 
     @Override
     public void welcomeNewNeighbor(RemotePeerStub neighbor) throws RemoteException {
-        neighbors.add(neighbor);
+        if (!neighbors.contains(neighbor)){
+            neighbors.add(neighbor);
+        }
+
     }
 
     @Override
@@ -187,6 +195,55 @@ public class Peer implements RemotePeerStub {
         }
     }
 
+    @Override
+    public void addOnlineNode(RemotePeerStub peer) throws RemoteException {
+
+    }
+
+    @Override
+    public String leave() throws RemoteException {
+        SortedMap<Float, RemotePeerStub> size = new TreeMap<Float, RemotePeerStub>();
+        for (RemotePeerStub neighbor : neighbors) {
+            if (neighbor.willMergeUniformly(zone)) {
+                merge(neighbor);
+                Logger.log("Successfully merged with" + neighbor.desc());
+                return Logger.deliverLog();
+            }
+            else {
+                size.put(neighbor.zoneSize(), neighbor);
+            }
+        }
+        RemotePeerStub smallest = size.get(size.firstKey());
+        merge(smallest);
+        Logger.log("Successfully merged with" + smallest.desc());
+        return Logger.deliverLog();
+
+
+    }
+
+    private void merge(RemotePeerStub neighbor) throws RemoteException {
+        for (RemotePeerStub n : neighbors) {
+            neighbor.notifyDeparture(stub);
+            neighbor.welcomeNewNeighbor(n);
+        }
+        neighbor.own(zone, hashtable);
+    }
+
+
+    public Float zoneSize() throws RemoteException {
+        return zone.size();
+    }
+
+    public boolean willMergeUniformly(CoordinateZone zone) throws RemoteException {
+        return this.zone.willMergeUniformly(zone);
+
+    }
+
+    @Override
+    public void own(CoordinateZone zone, Map hashtable) throws RemoteException {
+        this.zone.merge(zone);
+        this.hashtable.putAll(hashtable);
+    }
 
     private RemotePeerStub routeToClosestNeighbor(Point randomPoint) throws RemoteException {
         SortedMap<Float, RemotePeerStub> proximity = new TreeMap<Float, RemotePeerStub>();

@@ -1,12 +1,15 @@
 package geometry;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Ahmed Alabdullah on 9/24/14.
  */
 public class CoordinateZone implements Serializable {
 
+        List<CoordinateZone> subzones = new ArrayList<CoordinateZone>();
 
         private float findCenter(Point start, Point end) {
 
@@ -38,6 +41,24 @@ public class CoordinateZone implements Serializable {
         private Point yStart;
         private Point yEnd;
 
+    public Point getXStart() {
+        return xStart;
+    }
+
+    public Point getYStart() {
+        return yStart;
+    }
+
+    public Point getXEnd() {
+        return xEnd;
+    }
+
+    public Point getYEnd(){
+        return yEnd;
+    }
+
+
+
 
     public boolean hasPoint(Point randomPoint) {
 
@@ -48,11 +69,18 @@ public class CoordinateZone implements Serializable {
         float y1 = xEnd.getY();
 
         boolean hasIt = (x1 <= x2 ) && ( y2 <= y1 );
-        if (hasIt) {
-            System.out.println("point in zone");
-        }
-        else {
-            System.out.println("not in zone");
+
+        if (!hasIt) {
+            for (CoordinateZone zone : subzones) {
+                hasIt |= zone.hasPoint(randomPoint);
+            }
+            if (hasIt) {
+                System.out.println("point in zone");
+            }
+            else {
+                System.out.println("not in zone");
+            }
+
         }
         return hasIt;
 
@@ -189,6 +217,91 @@ public class CoordinateZone implements Serializable {
 
     public Line bottom() {
         return new Line(xStart, yStart);
+    }
+
+    public Float size() {
+        float length = xStart.distanceTo(xEnd);
+        float width = xStart.distanceTo(yStart);
+        return length*width;
+    }
+
+    public boolean willMergeUniformly(CoordinateZone zone) {
+
+        if (   shareBottom(zone) || shareTop(zone) || shareRight(zone) || shareLeft(zone)) {
+            return true;
+        }
+                return false;
+    }
+
+    private boolean shareLeft(CoordinateZone zone) {
+        return  zone.right().equals(left());
+    }
+
+    private boolean shareRight(CoordinateZone zone) {
+       return  zone.left().equals(right());
+    }
+
+    private boolean shareTop(CoordinateZone zone) {
+        return zone.bottom().equals(top());
+    }
+
+    private boolean shareBottom(CoordinateZone zone) {
+        return  zone.top().equals(bottom());
+    }
+
+    private void uniformMerge(CoordinateZone other) {
+
+        if (shareBottom(other)) {
+            xStart = other.getXStart();
+            yStart = other.getYStart();
+        }
+        else if (shareTop(other)) {
+            xEnd = other.getXEnd();
+            yEnd = other.getYEnd();
+        }
+        else if (shareLeft(other)) {
+            xStart = other.getXStart();
+            xEnd = other.getXEnd();
+        }
+
+        else if (shareRight(other)) {
+            yStart = other.getYStart();
+            yEnd = other.getYEnd();
+        }
+
+
+
+
+    }
+
+
+    public void merge(CoordinateZone zone) {
+        if (willMergeUniformly(zone)) {
+            uniformMerge(zone);
+        }
+        else {
+            //add zone here temporarily
+            subzones.add(zone);
+        }
+    }
+
+    public boolean inASubZone(Point peerPoint) {
+
+        for (CoordinateZone zone : subzones) {
+            if (zone.hasPoint(peerPoint)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public CoordinateZone getSubzoneOwning(Point peerPoint) {
+        for (CoordinateZone zone : subzones) {
+            if (zone.hasPoint(peerPoint)) {
+                return zone;
+            }
+        }
+        return null;
     }
 }
 
