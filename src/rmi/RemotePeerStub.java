@@ -46,5 +46,5 @@ public interface RemotePeerStub extends Remote {
 
     void removeOnlineNode(RemotePeerStub peer) throws RemoteException;
 
-    String toString() throws RemoteException;
+    String info() throws RemoteException;
 }

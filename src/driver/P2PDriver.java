@@ -129,14 +129,14 @@ public class P2PDriver {
         List<RemotePeerStub> nodes = bootstrap.findAvailableNodes();
 
         for (RemotePeerStub node: nodes) {
-            System.out.println(node);
+            System.out.println(node.info());
         }
 
     }
 
     private static void view(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
         RemotePeerStub peer = getPeer(peerId);
-        System.out.println(peer);
+        System.out.println(peer.info());
 
     }
 

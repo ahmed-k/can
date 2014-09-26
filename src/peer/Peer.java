@@ -266,7 +266,7 @@ public class Peer implements RemotePeerStub {
         this.stub = stub;
     }
 
-    public String toString() {
+    public String info() {
         try {
             return "Peer name: " + name + "\n" +
                     "IP Address: " + ip + "\n" +
