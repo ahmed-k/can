@@ -96,7 +96,7 @@ public class P2PDriver {
                                 System.out.println("Usage: JOIN [peer] ");
                             }
                             else if (input.length == 2) {
-                                String peerId = scanner.next();
+                                String peerId = input[1];
                                 join(peerId);
                             }
 
