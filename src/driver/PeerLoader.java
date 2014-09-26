@@ -28,10 +28,12 @@ public class PeerLoader  {
     public static Registry rmi;
     public static Scanner scanner = new Scanner(System.in);
     private static String host;
+    private static String ip;
     //public static String prefix = "compute-0-";
 
     private static void init() throws UnknownHostException, AlreadyBoundException, RemoteException {
         host = Network.initHost();
+        ip = Network.getIPAddress();
         rmi = Network.initRegistry(host);
         connect();
 
@@ -43,7 +45,7 @@ public class PeerLoader  {
         RemotePeerStub _peer = null;
         if (BOOTSTRAP.equals(host)) {
 
-            BootstrapPeer bootstrapPeer = new BootstrapPeer(host);
+            BootstrapPeer bootstrapPeer = new BootstrapPeer(host, ip);
             _peer = stub(bootstrapPeer);
             bootstrapPeer.setStub(_peer);
             bootstrapPeer.addOnlineNode(_peer);
@@ -52,7 +54,7 @@ public class PeerLoader  {
         }
 
         else {
-            Peer peer = new Peer(host);
+            Peer peer = new Peer(host, ip);
             _peer = stub(peer);
             peer.setStub(_peer);
         }

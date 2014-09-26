@@ -2,7 +2,6 @@ package rmi;
 
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -12,7 +11,7 @@ import java.rmi.registry.Registry;
  */
 public class Network {
 
-    private static Registry rmi;
+
 
     public static Registry getRegistry() throws RemoteException, UnknownHostException {
 
@@ -26,8 +25,13 @@ public class Network {
     }
 
     public static String getHost() throws UnknownHostException {
-        return java.net.InetAddress.getLocalHost().toString().split(".local")[0];
+        return java.net.InetAddress.getLocalHost().toString().split(".local/")[0];
     }
+
+    public static String getIPAddress() throws UnknownHostException {
+        return java.net.InetAddress.getLocalHost().toString().split(".local/")[1];
+    }
+
 
     public static String initHost() throws UnknownHostException {
 
@@ -57,9 +61,7 @@ public class Network {
     }
 
 
-    public static RemotePeerStub find(String node) throws RemoteException, NotBoundException {
-        return (RemotePeerStub) rmi.lookup(node);
-    }
+
 
 
 }

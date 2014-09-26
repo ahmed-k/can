@@ -12,8 +12,8 @@ public class BootstrapPeer extends Peer {
 
     private List<RemotePeerStub> onlineNodes = new ArrayList<RemotePeerStub>();
 
-    public BootstrapPeer(String name) {
-        super(name);
+    public BootstrapPeer(String name, String ip) {
+        super(name,ip);
     }
 
 

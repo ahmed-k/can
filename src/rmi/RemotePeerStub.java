@@ -27,4 +27,10 @@ public interface RemotePeerStub extends Remote {
     boolean noLongerANeighbor(CoordinateZone zone) throws RemoteException;
     void welcomeNewNeighbor(RemotePeerStub neighbor) throws RemoteException;
     void notifyDeparture(RemotePeerStub neighbor) throws RemoteException;
+
+    void insert(Point insertionPoint, String keyword) throws RemoteException;
+
+    String ip() throws RemoteException;
+
+    void search(Point insertionPoint, String keyword) throws RemoteException;
 }

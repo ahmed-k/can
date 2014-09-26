@@ -16,13 +16,15 @@ public class Peer implements RemotePeerStub {
 
     protected CoordinateZone zone;
     protected String name;
+    protected String ip;
     protected RemotePeerStub stub;
     protected List<RemotePeerStub> neighbors = new ArrayList<RemotePeerStub>();
-    protected Map<String, String> hashtable = new Hashtable<String, String>();
+    protected Map<String, String> hashtable = new Hashtable<String,String>();
 
-    public Peer(String name) {
+    public Peer(String name, String ip) {
 
         this.name = name;
+        this.ip= ip;
     }
 
     public Peer(String name, CoordinateZone zone) {
@@ -152,6 +154,37 @@ public class Peer implements RemotePeerStub {
     @Override
     public void notifyDeparture(RemotePeerStub neighbor) throws RemoteException {
         neighbors.remove(neighbor);
+    }
+
+    @Override
+    public void insert(Point insertionPoint, String keyword) throws RemoteException {
+        if (zone.hasPoint(insertionPoint)) {
+            System.out.println("keyword " + keyword + " stored in " + name);
+            hashtable.put(keyword, "file represented by " + keyword);
+        }
+        else {
+            RemotePeerStub closest = routeToClosestNeighbor(insertionPoint);
+            System.out.println (" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
+            closest.insert(insertionPoint, keyword);
+        }
+
+    }
+
+    @Override
+    public String ip() throws RemoteException {
+        return ip;
+    }
+
+    @Override
+    public void search(Point insertionPoint, String keyword) throws RemoteException {
+        if (zone.hasPoint(insertionPoint)) {
+            System.out.println("Found at peer " + name + " with IP " + ip);
+        }
+        else {
+            RemotePeerStub closest = routeToClosestNeighbor(insertionPoint);
+            System.out.println (" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
+            closest.search(insertionPoint, keyword);
+        }
     }
 
 
