@@ -45,7 +45,7 @@ public class CoordinateZone implements Serializable {
         float x1 = xStart.getX();
         float y1 = xEnd.getY();
 
-        boolean hasIt = (x1 < x2 ) && ( y2 < y1 );
+        boolean hasIt = (x1 <= x2 ) && ( y2 <= y1 );
         if (hasIt) {
             System.out.println("point in zone");
         }
