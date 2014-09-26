@@ -96,8 +96,22 @@ public class Peer implements RemotePeerStub {
         System.out.println ("zone split and now has dimensions: " + zone) ;
         System.out.println ("new zone has dimensions" + newZone);
         List<RemotePeerStub> departingNeighbors = removeDepartingNeighbors(zone);
+        this.welcomeNewNeighbor(peer);
+        peer.welcomeNewNeighbor(stub);
         peer.accept(newZone, departingNeighbors);
+        System.out.println("node " + name + " has neighbors: " + neighbors());
 
+
+    }
+
+
+    private String neighbors() throws RemoteException {
+        String retVal = "";
+        for (RemotePeerStub neighbor : neighbors) {
+            retVal += neighbor.desc() + " ";
+        }
+        retVal += ".";
+        return retVal;
     }
 
     private List<RemotePeerStub> removeDepartingNeighbors(CoordinateZone zone) throws RemoteException {
@@ -120,8 +134,9 @@ public class Peer implements RemotePeerStub {
 
         for (RemotePeerStub neighbor : neighbors) {
             neighbor.welcomeNewNeighbor(stub);
-            System.out.println("Accepted new neighbor" + neighbor.desc());
+
         }
+        System.out.println("node " + name + " has neighbors: " + neighbors());
     }
 
     @Override
