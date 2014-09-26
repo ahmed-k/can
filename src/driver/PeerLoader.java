@@ -2,9 +2,9 @@ package driver;
 
 
 import peer.BootstrapPeer;
-import peer.CoordinateZone;
+import geometry.CoordinateZone;
 import peer.Peer;
-import peer.Point;
+import geometry.Point;
 import rmi.Network;
 import rmi.RemotePeerStub;
 

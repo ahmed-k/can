@@ -1,6 +1,7 @@
 package rmi;
 
-import peer.Point;
+import geometry.CoordinateZone;
+import geometry.Point;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -17,8 +18,13 @@ public interface RemotePeerStub extends Remote {
 
     Point pickRandomPoint() throws RemoteException;
     RemotePeerStub route(Point randomPoint) throws RemoteException;
-    void splitZone(RemotePeerStub peer) throws RemoteException;
     Float calculateProximityTo(Point randomPoint)throws RemoteException;
     List<RemotePeerStub> findAvailableNodes() throws RemoteException;
     String desc() throws RemoteException;
+    void accomodate(RemotePeerStub peer) throws RemoteException;
+    void accept(CoordinateZone newZone, List<RemotePeerStub> departingNeighbors) throws RemoteException;
+
+    boolean noLongerANeighbor(CoordinateZone zone) throws RemoteException;
+    void welcomeNewNeighbor(RemotePeerStub neighbor) throws RemoteException;
+    void notifyDeparture(RemotePeerStub neighbor) throws RemoteException;
 }

@@ -1,7 +1,7 @@
 package driver;
 
 import debris.Command;
-import peer.Point;
+import geometry.Point;
 import rmi.Network;
 import rmi.RemotePeerStub;
 
@@ -68,8 +68,8 @@ public class PeerDriver {
         System.out.println("Picked random point: " + randomPoint);
         RemotePeerStub router = pickRandomOnlineNode(onlineNodes);
         System.out.println("Picked random online node: " + router.desc());
-        RemotePeerStub pointOwner = router.route(randomPoint);
-        pointOwner.splitZone(peer);
+        RemotePeerStub pointOwnerPeer = router.route(randomPoint);
+        pointOwnerPeer.accomodate(peer);
 
     }
 

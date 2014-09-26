@@ -1,5 +1,7 @@
 package peer;
 
+import geometry.CoordinateZone;
+import geometry.Point;
 import rmi.RemotePeerStub;
 
 import java.rmi.RemoteException;
@@ -16,7 +18,7 @@ public class Peer implements RemotePeerStub {
     protected String name;
     protected RemotePeerStub stub;
     protected List<RemotePeerStub> neighbors = new ArrayList<RemotePeerStub>();
-
+    protected Map<String, String> hashtable = new Hashtable<String, String>();
 
     public Peer(String name) {
 
@@ -63,6 +65,7 @@ public class Peer implements RemotePeerStub {
     @Override
     public RemotePeerStub route(Point randomPoint) throws RemoteException {
         if ( zone.hasPoint(randomPoint) ) {
+            System.out.println(name + " has the point!");
             return stub;
         }
         else {
@@ -86,11 +89,56 @@ public class Peer implements RemotePeerStub {
         return name + " : " + zone.toString();
     }
 
-
     @Override
-    public void splitZone(RemotePeerStub peer) throws RemoteException {
+    public void accomodate(RemotePeerStub peer) throws RemoteException {
+
+        CoordinateZone newZone = zone.splitInHalf();
+        System.out.println ("zone split and now has dimensions: " + zone) ;
+        System.out.println ("new zone has dimensions" + newZone);
+        List<RemotePeerStub> departingNeighbors = removeDepartingNeighbors(zone);
+        peer.accept(newZone, departingNeighbors);
 
     }
+
+    private List<RemotePeerStub> removeDepartingNeighbors(CoordinateZone zone) throws RemoteException {
+        List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
+        for (RemotePeerStub neighbor: neighbors) {
+            if (neighbor.noLongerANeighbor(zone)) {
+                System.out.println("Neighbor " + neighbor.desc() + " no longer a neighbor!");
+                neighbor.notifyDeparture(stub);
+                retVal.add(neighbor);
+            }
+        }
+        return retVal;
+    }
+
+    @Override
+    public void accept(CoordinateZone newZone, List<RemotePeerStub> newNeighbors) throws RemoteException {
+        zone = newZone;
+        neighbors = newNeighbors;
+        System.out.println("accepted new zone " + zone);
+
+        for (RemotePeerStub neighbor : neighbors) {
+            neighbor.welcomeNewNeighbor(stub);
+            System.out.println("Accepted new neighbor" + neighbor.desc());
+        }
+    }
+
+    @Override
+    public boolean noLongerANeighbor(CoordinateZone zone) throws RemoteException {
+        return this.zone.notAdjacentTo(zone);
+    }
+
+    @Override
+    public void welcomeNewNeighbor(RemotePeerStub neighbor) throws RemoteException {
+        neighbors.add(neighbor);
+    }
+
+    @Override
+    public void notifyDeparture(RemotePeerStub neighbor) throws RemoteException {
+        neighbors.remove(neighbor);
+    }
+
 
     private RemotePeerStub routeToClosestNeighbor(Point randomPoint) throws RemoteException {
         Map<Float, RemotePeerStub> proximity = new TreeMap<Float, RemotePeerStub>();

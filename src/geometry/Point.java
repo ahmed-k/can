@@ -1,4 +1,4 @@
-package peer;
+package geometry;
 
 import java.io.Serializable;
 
