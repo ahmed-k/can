@@ -103,8 +103,8 @@ public class Peer implements RemotePeerStub {
         List<RemotePeerStub> departingNeighbors = removeDepartingNeighborsNotTouching(zone);
         departingNeighbors.add(stub);
         this.welcomeNewNeighbor(peer);
-        System.out.println("Neighbors after welcoming new peers: " + neighbors());
         peer.accept(newZone, departingNeighbors);
+        System.out.println("Neighbors after welcoming new peers: " + neighbors());
         System.out.println("node " + name + " has neighbors: " + neighbors());
 
 
