@@ -13,6 +13,18 @@ import static org.junit.Assert.assertTrue;
 public class CoordinateZoneTests {
 
 
+    @Test public void itShouldBeAbleToUnderstandWhichZonesTouchIt() {
+
+        CoordinateZone zone = new CoordinateZone(new Point(0,0), new Point(0,10), new Point(10,0), new Point(10,10));
+        CoordinateZone zone2 = zone.splitInHalf();
+        CoordinateZone zone3 = zone2.splitInHalf();
+        assertTrue(zone.adjacentTo(zone2));
+        assertTrue(zone.adjacentTo(zone3));
+
+
+
+    }
+
     @Test
     public void itShouldSplitAccurately() {
         CoordinateZone zone = new CoordinateZone(new Point(0,0), new Point(0,10), new Point(10,0), new Point(10,10));

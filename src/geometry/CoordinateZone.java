@@ -128,10 +128,14 @@ public class CoordinateZone implements Serializable {
 
     }
 
-    public boolean notAdjacentTo(CoordinateZone zone) {
+    public boolean adjacentTo(CoordinateZone zone) {
        return zone.touchTop(this.bottom()) || zone.touchBottom(this.top()) || zone.touchLeft(this.right()) || zone.touchRight(this.left()) ;
 
 
+    }
+
+    public boolean notAdjacentTo(CoordinateZone zone) {
+        return !adjacentTo(zone);
     }
 
 
@@ -296,7 +300,9 @@ public class CoordinateZone implements Serializable {
     public CoordinateZone getSubzoneOwning(Point peerPoint) {
         for (CoordinateZone zone : subzones) {
             if (zone.hasPoint(peerPoint)) {
+                subzones.remove(zone);
                 return zone;
+
             }
         }
         return null;
