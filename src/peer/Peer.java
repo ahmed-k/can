@@ -264,10 +264,26 @@ public class Peer implements RemotePeerStub {
         mergeNeighbors(neighbors);
     }
 
+    public void shakeHands(RemotePeerStub newNeighbor) throws RemoteException {
+        neighbors.add(newNeighbor);
+        newNeighbor.welcomeNewNeighbor(stub);
+    }
+
+    public void seeOff(RemotePeerStub neighbor) throws RemoteException {
+        neighbors.remove(neighbor);
+        neighbor.notifyDeparture(stub);
+
+    }
+
+
+    private boolean isNotAlreadyANeighbor(RemotePeerStub newNeighbor) throws RemoteException {
+        return !neighbors.contains(newNeighbor) && ( !(newNeighbor.ip().equals( this.ip() ) ) );
+    }
+
     private void mergeNeighbors(List<RemotePeerStub> newNeighbors) throws RemoteException {
         for (RemotePeerStub newNeighbor: newNeighbors) {
-            if (!neighbors.contains(newNeighbor) && ( !(newNeighbor.ip().equals( this.ip() ) ) ) ) {
-                neighbors.add(newNeighbor);
+            if (isNotAlreadyANeighbor(newNeighbor)) {
+                this.shakeHands(newNeighbor);
             }
         }
     }
