@@ -103,7 +103,6 @@ public class Peer implements RemotePeerStub {
         List<RemotePeerStub> newZoneNeighbors = addNeighborsToNewPeer(zone, newZone);
         this.welcomeNewNeighbor(peer);
         peer.accept(newZone, newZoneNeighbors);
-        System.out.println("Neighbors after welcoming new peers: " + neighbors());
         System.out.println("node " + name + " has neighbors: " + neighbors());
 
 
@@ -114,6 +113,7 @@ public class Peer implements RemotePeerStub {
         List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
         for (RemotePeerStub neighbor: neighbors) {
             if (!neighbor.doesntTouch(zone)) {
+                System.out.println(neighbor.desc() + " still a neighbor of " + desc() + " but also will be neighbor of new node");
                 retVal.add(neighbor);
             }
 
@@ -242,7 +242,8 @@ public class Peer implements RemotePeerStub {
             n.notifyDeparture(stub);
         }
         zone = null;
-        neighbors = null;
+        neighbors.clear();
+        hashtable.clear();
 
     }
 
