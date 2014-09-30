@@ -100,13 +100,33 @@ public class Peer implements RemotePeerStub {
         }
         System.out.println("zone split and now has dimensions: " + zone);
         System.out.println("new zone has dimensions" + newZone);
-        List<RemotePeerStub> departingNeighbors = removeDepartingNeighborsNotTouching(zone);
-        departingNeighbors.add(stub);
+        List<RemotePeerStub> newZoneNeighbors = addNeighborsToNewPeer(zone, newZone);
         this.welcomeNewNeighbor(peer);
-        peer.accept(newZone, departingNeighbors);
+        peer.accept(newZone, newZoneNeighbors);
         System.out.println("Neighbors after welcoming new peers: " + neighbors());
         System.out.println("node " + name + " has neighbors: " + neighbors());
 
+
+    }
+
+
+    private List<RemotePeerStub> addNeighborsTouching(CoordinateZone newZone) throws RemoteException {
+        List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
+        for (RemotePeerStub neighbor: neighbors) {
+            if (!neighbor.doesntTouch(zone)) {
+                retVal.add(neighbor);
+            }
+
+        }
+        return retVal;
+    }
+
+    private List<RemotePeerStub> addNeighborsToNewPeer(CoordinateZone oldZone, CoordinateZone newZone) throws RemoteException {
+        List<RemotePeerStub> neighbors = new ArrayList<RemotePeerStub>();
+        neighbors.addAll(removeDepartingNeighborsNotTouching(oldZone));
+        neighbors.addAll(addNeighborsTouching(newZone));
+        neighbors.add(stub);
+        return neighbors;
 
     }
 
@@ -122,7 +142,7 @@ public class Peer implements RemotePeerStub {
     private List<RemotePeerStub> removeDepartingNeighborsNotTouching(CoordinateZone zone) throws RemoteException {
         List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
         for (RemotePeerStub neighbor : neighbors) {
-            if (neighbor.noLongerANeighbor(zone)) {
+            if (neighbor.doesntTouch(zone)) {
                 System.out.println("Neighbor " + neighbor.desc() + " no longer a neighbor!");
                 neighbor.notifyDeparture(stub);
                 retVal.add(neighbor);
@@ -145,7 +165,7 @@ public class Peer implements RemotePeerStub {
     }
 
     @Override
-    public boolean noLongerANeighbor(CoordinateZone zone) throws RemoteException {
+    public boolean doesntTouch(CoordinateZone zone) throws RemoteException {
         return this.zone.notAdjacentTo(zone);
     }
 

@@ -24,7 +24,7 @@ public interface RemotePeerStub extends Remote {
     void accomodate(RemotePeerStub peer, Point peerPoint) throws RemoteException;
     void accept(CoordinateZone newZone, List<RemotePeerStub> departingNeighbors) throws RemoteException;
 
-    boolean noLongerANeighbor(CoordinateZone zone) throws RemoteException;
+    boolean doesntTouch(CoordinateZone zone) throws RemoteException;
     void welcomeNewNeighbor(RemotePeerStub neighbor) throws RemoteException;
     void notifyDeparture(RemotePeerStub neighbor) throws RemoteException;
 
