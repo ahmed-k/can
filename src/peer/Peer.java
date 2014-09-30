@@ -241,6 +241,9 @@ public class Peer implements RemotePeerStub {
         for (RemotePeerStub n: neighbors) {
             n.notifyDeparture(stub);
         }
+        zone = null;
+        neighbors = null;
+
     }
 
 
@@ -260,9 +263,9 @@ public class Peer implements RemotePeerStub {
         mergeNeighbors(neighbors);
     }
 
-    private void mergeNeighbors(List<RemotePeerStub> newNeighbors) {
+    private void mergeNeighbors(List<RemotePeerStub> newNeighbors) throws RemoteException {
         for (RemotePeerStub newNeighbor: newNeighbors) {
-            if (!neighbors.contains(newNeighbor) && newNeighbor != stub) {
+            if (!neighbors.contains(newNeighbor) && ( !(newNeighbor.ip().equals( this.ip() ) ) ) ) {
                 neighbors.add(newNeighbor);
             }
         }
