@@ -13,6 +13,13 @@ import static org.junit.Assert.assertTrue;
 public class CoordinateZoneTests {
 
 
+
+    @Test public void itShouldFindCenterOfZoneAccurately() {
+        CoordinateZone zone = new CoordinateZone(new Point(0,0), new Point(0,10), new Point (10,0), new Point(10,10));
+        assertTrue("fails with distance = " + zone.distanceFromCenterTo(new Point (5,5)), 0f == zone.distanceFromCenterTo(new Point (5,5)));
+    }
+
+
     @Test public void itShouldBeAbleToUnderstandWhichZonesTouchIt() {
 
         CoordinateZone zone = new CoordinateZone(new Point(0,0), new Point(0,10), new Point(10,0), new Point(10,10));
@@ -23,6 +30,12 @@ public class CoordinateZoneTests {
 
 
 
+    }
+
+    @Test public void itShouldDetermineIfItHasAPoint() {
+        Point point = new Point(5, 6);
+        CoordinateZone zone = new CoordinateZone(new Point(0, 5), new Point(0,10), new Point(10,5), new Point(10, 10));
+        assertTrue(zone.hasPoint(point));
     }
 
     @Test

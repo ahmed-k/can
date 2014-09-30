@@ -14,7 +14,7 @@ public class CoordinateZone implements Serializable {
 
 
         public float distanceFromCenterTo(Point point) {
-            Point centroidX  = new Line(xStart, xEnd).findCenter();
+            Point centroidX  = new Line(xStart, yStart).findCenter();
             Point centroidY = new Line(yStart, yEnd).findCenter();
             Point centroid = new Point(centroidX.getX(), centroidY.getY());
             System.out.println("zone center is " + centroid);
@@ -55,13 +55,13 @@ public class CoordinateZone implements Serializable {
 
     public boolean hasPoint(Point randomPoint) {
 
-        float x = randomPoint.getX();
-        float y = randomPoint.getY();
+        float x = randomPoint.getX(); //5
+        float y = randomPoint.getY(); //6
 
-        float xRangeBegin = xStart.getX();
-        float xRangeEnd = yStart.getX();
-        float yRangeBegin = xStart.getY();
-        float yRangeEnd = xEnd.getY();
+        float xRangeBegin = xStart.getX(); //0
+        float xRangeEnd = yStart.getX(); //10
+        float yRangeBegin = xStart.getY(); //5
+        float yRangeEnd = xEnd.getY(); //10
         boolean withinX = ( xRangeBegin <= x && x <= xRangeEnd );
         boolean withinY = ( yRangeBegin <= y && y <= yRangeEnd );
 
@@ -306,6 +306,16 @@ public class CoordinateZone implements Serializable {
             }
         }
         return null;
+    }
+
+    public Float proximityTo(Point randomPoint) {
+        Float proximity = this.distanceFromCenterTo(randomPoint);
+
+        for (CoordinateZone subzone : subzones) {
+            Float subzoneDistance = subzone.distanceFromCenterTo(randomPoint);
+            proximity = (subzoneDistance < proximity) ? subzoneDistance : proximity;
+        }
+        return proximity;
     }
 }
 

@@ -77,7 +77,7 @@ public class Peer implements RemotePeerStub {
 
     @Override
     public Float calculateProximityTo(Point randomPoint) {
-        return zone.distanceFromCenterTo(randomPoint);
+        return zone.proximityTo(randomPoint);
     }
 
     @Override
