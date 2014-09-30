@@ -262,7 +262,7 @@ public class Peer implements RemotePeerStub {
 
     private void mergeNeighbors(List<RemotePeerStub> newNeighbors) {
         for (RemotePeerStub newNeighbor: newNeighbors) {
-            if (!neighbors.contains(newNeighbor)) {
+            if (!neighbors.contains(newNeighbor) && newNeighbor != stub) {
                 neighbors.add(newNeighbor);
             }
         }
