@@ -146,6 +146,7 @@ public class P2PDriver {
         String log = peer.leave();
         RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
         bootstrap.removeOnlineNode(peer);
+        System.out.println(log);
 
     }
 

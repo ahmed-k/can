@@ -237,11 +237,10 @@ public class Peer implements RemotePeerStub {
     }
 
     private void merge(RemotePeerStub neighbor) throws RemoteException {
-        for (RemotePeerStub n : neighbors) {
-            neighbor.notifyDeparture(stub);
-            neighbor.welcomeNewNeighbor(n);
+        neighbor.own(zone, hashtable, neighbors);
+        for (RemotePeerStub n: neighbors) {
+            n.notifyDeparture(stub);
         }
-        neighbor.own(zone, hashtable);
     }
 
 
@@ -255,9 +254,18 @@ public class Peer implements RemotePeerStub {
     }
 
     @Override
-    public void own(CoordinateZone zone, Map hashtable) throws RemoteException {
+    public void own(CoordinateZone zone, Map hashtable, List<RemotePeerStub> neighbors) throws RemoteException {
         this.zone.merge(zone);
         this.hashtable.putAll(hashtable);
+        mergeNeighbors(neighbors);
+    }
+
+    private void mergeNeighbors(List<RemotePeerStub> newNeighbors) {
+        for (RemotePeerStub newNeighbor: newNeighbors) {
+            if (!neighbors.contains(newNeighbor)) {
+                neighbors.add(newNeighbor);
+            }
+        }
     }
 
     @Override
