@@ -3,6 +3,9 @@ package test;
 import geometry.CoordinateZone;
 import geometry.Point;
 import org.junit.Test;
+import peer.Peer;
+
+import java.rmi.RemoteException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,11 +37,15 @@ public class CoordinateZoneTests {
     }
 
 
-    @Test public void itShouldRecognizeDiagonalAdjacencyIsNotNeighborhood() {
+    @Test public void itShouldRecognizeDiagonalAdjacencyIsNotNeighborhood() throws RemoteException {
         CoordinateZone zone1 = new CoordinateZone(new Point(0,0), new Point(0,5), new Point(5,0), new Point(5,5));
         CoordinateZone zone2 = new CoordinateZone(new Point(5,0), new Point(5,5), new Point(10,0), new Point(10,5));
         CoordinateZone zone3 = new CoordinateZone(new Point(0,5), new Point(0,10), new Point(5,5), new Point(5,10));
         CoordinateZone zone4 = new CoordinateZone(new Point(5,5), new Point(5,10), new Point(10,5), new Point(10,10));
+
+        Peer p1 = new Peer("peer4", zone3);
+
+        assertFalse(!p1.doesntTouch(zone2));
 
         assertTrue(zone1.adjacentTo(zone2));
         assertTrue(zone1.adjacentTo(zone3));
@@ -58,7 +65,7 @@ public class CoordinateZoneTests {
 
     @Test public void itShouldFindCenterOfZoneAccurately() {
         CoordinateZone zone = new CoordinateZone(new Point(0,0), new Point(0,10), new Point (10,0), new Point(10,10));
-        assertTrue("fails with distance = " + zone.distanceFromCenterTo(new Point (5,5)), 0f == zone.distanceFromCenterTo(new Point (5,5)));
+        assertTrue("fails with distance = " + zone.distanceFromCenterTo(new Point(5, 5)), 0f == zone.distanceFromCenterTo(new Point(5, 5)));
     }
 
 

@@ -105,7 +105,7 @@ public class Peer implements RemotePeerStub {
     private List<RemotePeerStub> addNeighborsTouching(CoordinateZone newZone) throws RemoteException {
         List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
         for (RemotePeerStub neighbor: neighbors) {
-            if (!neighbor.doesntTouch(zone)) {
+            if (!neighbor.doesntTouch(newZone)) {
                 System.out.println(neighbor.desc() + " still a neighbor of " + desc() + " but also will be neighbor of new node");
                 retVal.add(neighbor);
             }
