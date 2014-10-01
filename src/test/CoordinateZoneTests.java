@@ -13,6 +13,27 @@ import static org.junit.Assert.assertTrue;
 public class CoordinateZoneTests {
 
 
+    @Test public void itShouldRecognizeDiagonalAdjacencyIsNotNeighborhood() {
+        CoordinateZone zone1 = new CoordinateZone(new Point(0,0), new Point(0,5), new Point(5,0), new Point(5,5));
+        CoordinateZone zone2 = new CoordinateZone(new Point(5,0), new Point(5,5), new Point(10,0), new Point(10,5));
+        CoordinateZone zone3 = new CoordinateZone(new Point(0,5), new Point(0,10), new Point(5,5), new Point(5,10));
+        CoordinateZone zone4 = new CoordinateZone(new Point(5,5), new Point(5,10), new Point(10,5), new Point(10,10));
+
+        assertTrue(zone1.adjacentTo(zone2));
+        assertTrue(zone1.adjacentTo(zone3));
+        assertFalse(zone1.adjacentTo(zone4));
+        assertTrue(zone2.adjacentTo(zone1));
+        assertTrue(zone2.adjacentTo(zone4));
+        assertFalse(zone2.adjacentTo(zone3));
+        assertTrue(zone3.adjacentTo(zone1));
+        assertTrue(zone3.adjacentTo(zone4));
+        assertFalse(zone3.adjacentTo(zone2));
+        assertTrue(zone4.adjacentTo(zone2));
+        assertTrue(zone4.adjacentTo(zone3));
+        assertFalse(zone4.adjacentTo(zone1));
+
+
+    }
 
     @Test public void itShouldFindCenterOfZoneAccurately() {
         CoordinateZone zone = new CoordinateZone(new Point(0,0), new Point(0,10), new Point (10,0), new Point(10,10));

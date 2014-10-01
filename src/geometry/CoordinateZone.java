@@ -144,9 +144,9 @@ public class CoordinateZone implements Serializable {
         Point fStart = first.getStart();
         Point sStart = second.getStart();
 
-        if (fStart.getY() <= sStart.getY() && fEnd.getY() >= sStart.getY()
+        if ((fStart.getY() <= sStart.getY() && fEnd.getY() >= sStart.getY() && fEnd.distanceTo(sStart) != 0)
             ||
-                fStart.getY() >= sStart.getY() && fStart.getY() <= sEnd.getY())
+        ( fStart.getY() >= sStart.getY() && fStart.getY() <= sEnd.getY() && fStart.distanceTo(sEnd) !=0 ) )
         {
             return true;
         }
@@ -173,9 +173,9 @@ public class CoordinateZone implements Serializable {
         Point fStart = first.getStart();
         Point sStart = second.getStart();
 
-        if (fStart.getX() <= sStart.getX() && fEnd.getX() >= sStart.getX()
+        if ((fStart.getX() <= sStart.getX() && fEnd.getX() >= sStart.getX() && fEnd.distanceTo(sStart) != 0)
                     ||
-            fStart.getX() >= sStart.getX() && fStart.getX() <= sEnd.getX())
+            fStart.getX() >= sStart.getX() && fEnd.getX() <= sEnd.getX() && sEnd.distanceTo(fStart) != 0)
 
         {
             return  true;
