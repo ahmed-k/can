@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
 public class Logger implements RemoteLoggerStub {
 
     private static String content="";
-    private Logger instance;
+    private static Logger instance;
     private static int i;
 
 
@@ -23,7 +23,7 @@ public class Logger implements RemoteLoggerStub {
 
 
 
-    public Logger createLogger() {
+    public static Logger createInstance() {
         if (instance == null) {
             instance = new Logger();
         }

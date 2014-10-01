@@ -68,7 +68,7 @@ public class Network {
 
     public static RemoteLoggerStub initLogger() throws RemoteException, AlreadyBoundException {
         Registry rmi = LocateRegistry.getRegistry(Constants.BOOTSTRAP, 1077);
-        RemoteLoggerStub _logger = (RemoteLoggerStub) UnicastRemoteObject.exportObject(new Logger(), 1077);
+        RemoteLoggerStub _logger = (RemoteLoggerStub) UnicastRemoteObject.exportObject(Logger.createInstance(), 1077);
         rmi.bind("logger", _logger);
         return _logger;
     }
