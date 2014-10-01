@@ -326,6 +326,7 @@ public class Peer implements RemotePeerStub {
 
 
     private void log(String msg) throws RemoteException, UnknownHostException, NotBoundException {
+        //
         logger.log(msg);
     }
 
