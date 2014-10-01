@@ -106,7 +106,7 @@ public class Peer implements RemotePeerStub {
         List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
         for (RemotePeerStub neighbor: neighbors) {
             if (!neighbor.doesntTouch(zone)) {
-                //System.out.println(neighbor.desc() + " still a neighbor of " + desc() + " but also will be neighbor of new node");
+                System.out.println(neighbor.desc() + " still a neighbor of " + desc() + " but also will be neighbor of new node");
                 retVal.add(neighbor);
             }
 
