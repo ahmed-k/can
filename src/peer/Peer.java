@@ -213,22 +213,28 @@ public class Peer implements RemotePeerStub {
 
     }
 
-    @Override
-    public void leave() throws RemoteException, NotBoundException, UnknownHostException {
-        logger.log("Peers affected by leave operation:");
+    private RemotePeerStub findMerger() throws RemoteException, NotBoundException, UnknownHostException {
         SortedMap<Float, RemotePeerStub> size = new TreeMap<Float, RemotePeerStub>();
         for (RemotePeerStub neighbor : neighbors) {
             if (neighbor.willMergeUniformly(zone)) {
-                merge(neighbor);
-                log("Successfully merged with " + neighbor.desc());
+                return neighbor;
+
 
             } else {
                 size.put(neighbor.zoneSize(), neighbor);
             }
         }
-        RemotePeerStub smallest = size.get(size.firstKey());
-        merge(smallest);
-       log("Successfully merged with " + smallest.desc());
+        return size.get(size.firstKey());
+
+    }
+
+
+    @Override
+    public void leave() throws RemoteException, NotBoundException, UnknownHostException {
+        logger.log("Peers affected by leave operation:");
+        RemotePeerStub merger = findMerger();
+        merge(merger);
+       log("Successfully merged with " + merger.desc());
 
 
 
