@@ -30,7 +30,7 @@ public class Logger implements RemoteLoggerStub {
         return instance;
     }
 
-
+    @Override
     public String deliverLog() throws RemoteException {
         String retVal = content;
         content = "";

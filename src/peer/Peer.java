@@ -329,7 +329,7 @@ public class Peer implements RemotePeerStub {
         logger.log(msg);
     }
 
-    public void setLogger(RemoteLoggerStub logger) {
+    public void setLogger(RemoteLoggerStub logger) throws RemoteException {
         this.logger = logger;
     }
 }

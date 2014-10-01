@@ -47,5 +47,5 @@ public interface RemotePeerStub extends Remote {
 
     String info() throws RemoteException;
 
-    void setLogger(RemoteLoggerStub logger);
+    void setLogger(RemoteLoggerStub logger) throws RemoteException;
 }
