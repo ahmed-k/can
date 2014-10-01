@@ -17,7 +17,7 @@ public class CoordinateZone implements Serializable {
             Point centroidX  = new Line(xStart, yStart).findCenter();
             Point centroidY = new Line(yStart, yEnd).findCenter();
             Point centroid = new Point(centroidX.getX(), centroidY.getY());
-            System.out.println("zone center is " + centroid);
+            //System.out.println("zone center is " + centroid);
             return point.distanceTo(centroid);
 
         }
@@ -72,13 +72,6 @@ public class CoordinateZone implements Serializable {
             for (CoordinateZone zone : subzones) {
                 hasIt |= zone.hasPoint(randomPoint);
             }
-            if (hasIt) {
-                System.out.println("point in zone");
-            }
-            else {
-                System.out.println("not in zone");
-            }
-
         }
         return hasIt;
 

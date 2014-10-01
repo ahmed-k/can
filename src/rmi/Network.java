@@ -1,10 +1,15 @@
 package rmi;
 
+import debris.Constants;
+import debris.Logger;
+
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 /**
  * Created by Ahmed Alabdullah on 9/25/14.
@@ -61,7 +66,15 @@ public class Network {
     }
 
 
+    public static RemoteLoggerStub initLogger() throws RemoteException, AlreadyBoundException {
+        Registry rmi = LocateRegistry.getRegistry(Constants.BOOTSTRAP, 1077);
+        RemoteLoggerStub _logger = (RemoteLoggerStub) UnicastRemoteObject.exportObject(new Logger(), 1077);
+        rmi.bind("logger", _logger);
+        return _logger;
+    }
 
-
-
+    public static RemoteLoggerStub getLogger() throws RemoteException, NotBoundException {
+         Registry rmi = LocateRegistry.getRegistry(Constants.BOOTSTRAP, 1077);
+        return (RemoteLoggerStub) rmi.lookup("logger");
+    }
 }

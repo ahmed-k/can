@@ -1,19 +1,21 @@
 package driver;
 
 
-import peer.BootstrapPeer;
 import geometry.CoordinateZone;
-import peer.Peer;
 import geometry.Point;
+import peer.BootstrapPeer;
+import peer.Peer;
 import rmi.Network;
+import rmi.RemoteLoggerStub;
 import rmi.RemotePeerStub;
 
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
-import java.util.Scanner;
-import static debris.Constants.*;
+
+import static debris.Constants.BOOTSTRAP;
+import static debris.Constants.UNIVERSE;
 import static peer.Peer.stub;
 
 
@@ -22,14 +24,9 @@ import static peer.Peer.stub;
  */
 public class PeerLoader  {
 
-
-
-    private String name;
     public static Registry rmi;
-    public static Scanner scanner = new Scanner(System.in);
     private static String host;
     private static String ip;
-    //public static String prefix = "compute-0-";
 
     private static void init() throws UnknownHostException, AlreadyBoundException, RemoteException {
         host = Network.initHost();
@@ -50,6 +47,11 @@ public class PeerLoader  {
             bootstrapPeer.setStub(_peer);
             bootstrapPeer.addOnlineNode(_peer);
             bootstrapPeer.setZone(new CoordinateZone(new Point(0,0), new Point(0,UNIVERSE), new Point(UNIVERSE,0), new Point(UNIVERSE,UNIVERSE)));
+            RemoteLoggerStub logger = Network.initLogger();
+            bootstrapPeer.setLogger(logger);
+
+            //init distributed logger at bootstrap node
+
 
         }
 
@@ -62,7 +64,7 @@ public class PeerLoader  {
 
 
         rmi.bind(host, _peer);
-        System.out.println( host + " is online...");
+        System.out.println( host + " is online...\n");
 
     }
 

@@ -3,6 +3,8 @@ package rmi;
 import geometry.CoordinateZone;
 import geometry.Point;
 
+import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -13,11 +15,8 @@ import java.util.List;
 public interface RemotePeerStub extends Remote {
 
 
-    public String sayHi() throws RemoteException;
-    public void send(String msg) throws RemoteException;
-
     Point pickRandomPoint() throws RemoteException;
-    RemotePeerStub route(Point randomPoint) throws RemoteException;
+    RemotePeerStub route(Point randomPoint) throws RemoteException, NotBoundException, UnknownHostException;
     Float calculateProximityTo(Point randomPoint)throws RemoteException;
     List<RemotePeerStub> findAvailableNodes() throws RemoteException;
     String desc() throws RemoteException;
@@ -28,15 +27,15 @@ public interface RemotePeerStub extends Remote {
     void welcomeNewNeighbor(RemotePeerStub neighbor) throws RemoteException;
     void notifyDeparture(RemotePeerStub neighbor) throws RemoteException;
 
-    void insert(Point insertionPoint, String keyword) throws RemoteException;
+    void insert(Point insertionPoint, String keyword) throws RemoteException, NotBoundException, UnknownHostException;
 
     String ip() throws RemoteException;
 
-    void search(Point insertionPoint, String keyword) throws RemoteException;
+    void search(Point insertionPoint, String keyword) throws RemoteException, NotBoundException, UnknownHostException;
 
     void addOnlineNode(RemotePeerStub peer) throws RemoteException;
 
-    String leave() throws RemoteException;
+    void leave() throws RemoteException, NotBoundException, UnknownHostException;
 
     Float zoneSize() throws RemoteException;
 
@@ -47,4 +46,6 @@ public interface RemotePeerStub extends Remote {
     void removeOnlineNode(RemotePeerStub peer) throws RemoteException;
 
     String info() throws RemoteException;
+
+    void setLogger(RemoteLoggerStub logger);
 }

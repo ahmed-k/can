@@ -1,10 +1,12 @@
 package peer;
 
-import debris.Logger;
 import geometry.CoordinateZone;
 import geometry.Point;
+import rmi.RemoteLoggerStub;
 import rmi.RemotePeerStub;
 
+import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
@@ -21,6 +23,7 @@ public class Peer implements RemotePeerStub {
     protected RemotePeerStub stub;
     protected List<RemotePeerStub> neighbors = new ArrayList<RemotePeerStub>();
     protected Map<String, String> hashtable = new Hashtable<String, String>();
+    private RemoteLoggerStub logger;
 
     public Peer(String name, String ip) {
 
@@ -32,17 +35,6 @@ public class Peer implements RemotePeerStub {
         this.name = name;
         this.zone = zone;
     }
-
-    @Override
-    public String sayHi() throws RemoteException {
-        return name;
-    }
-
-    @Override
-    public void send(String msg) {
-        System.out.println(msg);
-    }
-
 
     public CoordinateZone getZone() {
         return zone;
@@ -65,9 +57,9 @@ public class Peer implements RemotePeerStub {
     }
 
     @Override
-    public RemotePeerStub route(Point randomPoint) throws RemoteException {
+    public RemotePeerStub route(Point randomPoint) throws RemoteException, NotBoundException, UnknownHostException {
         if (zone.hasPoint(randomPoint)) {
-            System.out.println(name + " has the point!");
+            //System.out.println( name + " has the point!");
             return stub;
         } else {
             return routeToClosestNeighbor(randomPoint);
@@ -87,7 +79,7 @@ public class Peer implements RemotePeerStub {
 
     @Override
     public String desc() throws RemoteException {
-        return name + " : " + zone.toString();
+        return name;
     }
 
     @Override
@@ -98,12 +90,13 @@ public class Peer implements RemotePeerStub {
         } else {
             newZone = zone.splitInHalf();
         }
-        System.out.println("zone split and now has dimensions: " + zone);
-        System.out.println("new zone has dimensions" + newZone);
+        //System.out.println("zone split and now has dimensions: " + zone);
+        //System.out.println("new zone has dimensions" + newZone);
         List<RemotePeerStub> newZoneNeighbors = addNeighborsToNewPeer(zone, newZone);
         this.welcomeNewNeighbor(peer);
+        peer.setLogger(logger);
         peer.accept(newZone, newZoneNeighbors);
-        System.out.println("node " + name + " has neighbors: " + neighbors());
+        //System.out.println("node " + name + " has neighbors: " + neighbors());
 
 
     }
@@ -113,7 +106,7 @@ public class Peer implements RemotePeerStub {
         List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
         for (RemotePeerStub neighbor: neighbors) {
             if (!neighbor.doesntTouch(zone)) {
-                System.out.println(neighbor.desc() + " still a neighbor of " + desc() + " but also will be neighbor of new node");
+                //System.out.println(neighbor.desc() + " still a neighbor of " + desc() + " but also will be neighbor of new node");
                 retVal.add(neighbor);
             }
 
@@ -143,7 +136,7 @@ public class Peer implements RemotePeerStub {
         List<RemotePeerStub> retVal = new ArrayList<RemotePeerStub>();
         for (RemotePeerStub neighbor : neighbors) {
             if (neighbor.doesntTouch(zone)) {
-                System.out.println("Neighbor " + neighbor.desc() + " no longer a neighbor!");
+                //System.out.println("Neighbor " + neighbor.desc() + " no longer a neighbor!");
                 neighbor.notifyDeparture(stub);
                 retVal.add(neighbor);
             }
@@ -155,13 +148,13 @@ public class Peer implements RemotePeerStub {
     public void accept(CoordinateZone newZone, List<RemotePeerStub> newNeighbors) throws RemoteException {
         zone = newZone;
         neighbors = newNeighbors;
-        System.out.println("accepted new zone " + zone);
+        //System.out.println("accepted new zone " + zone);
 
         for (RemotePeerStub neighbor : neighbors) {
             neighbor.welcomeNewNeighbor(stub);
 
         }
-        System.out.println("node " + name + " has neighbors: " + neighbors());
+        //System.out.println("node " + name + " has neighbors: " + neighbors());
     }
 
     @Override
@@ -183,13 +176,15 @@ public class Peer implements RemotePeerStub {
     }
 
     @Override
-    public void insert(Point insertionPoint, String keyword) throws RemoteException {
+    public void insert(Point insertionPoint, String keyword) throws RemoteException, NotBoundException, UnknownHostException {
+
         if (zone.hasPoint(insertionPoint)) {
-            System.out.println("keyword " + keyword + " stored in " + name);
+            //System.out.println("keyword " + keyword + " stored in " + name);
+            log("Keyword" + keyword + " stored in peer " + name + "at IP address " + ip);
             hashtable.put(keyword, "file represented by " + keyword);
         } else {
             RemotePeerStub closest = routeToClosestNeighbor(insertionPoint);
-            System.out.println(" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
+            log(" Keyword stored at peer " + closest.desc() + "with IP address " + closest.ip());
             closest.insert(insertionPoint, keyword);
         }
 
@@ -201,12 +196,12 @@ public class Peer implements RemotePeerStub {
     }
 
     @Override
-    public void search(Point insertionPoint, String keyword) throws RemoteException {
+    public void search(Point insertionPoint, String keyword) throws RemoteException, NotBoundException, UnknownHostException {
         if (zone.hasPoint(insertionPoint)) {
-            System.out.println("Found at peer " + name + " with IP " + ip);
+            log("Found at peer " + name + " with IP " + ip);
         } else {
             RemotePeerStub closest = routeToClosestNeighbor(insertionPoint);
-            System.out.println(" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
+            log(" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
             closest.search(insertionPoint, keyword);
         }
     }
@@ -217,21 +212,21 @@ public class Peer implements RemotePeerStub {
     }
 
     @Override
-    public String leave() throws RemoteException {
+    public void leave() throws RemoteException, NotBoundException, UnknownHostException {
         SortedMap<Float, RemotePeerStub> size = new TreeMap<Float, RemotePeerStub>();
         for (RemotePeerStub neighbor : neighbors) {
             if (neighbor.willMergeUniformly(zone)) {
                 merge(neighbor);
-                Logger.log("Successfully merged with" + neighbor.desc());
-                return Logger.deliverLog();
+                log("Successfully merged with" + neighbor.desc());
+
             } else {
                 size.put(neighbor.zoneSize(), neighbor);
             }
         }
         RemotePeerStub smallest = size.get(size.firstKey());
         merge(smallest);
-        Logger.log("Successfully merged with" + smallest.desc());
-        return Logger.deliverLog();
+       log("Successfully merged with" + smallest.desc());
+
 
 
     }
@@ -293,12 +288,13 @@ public class Peer implements RemotePeerStub {
 
     }
 
-    private RemotePeerStub routeToClosestNeighbor(Point randomPoint) throws RemoteException {
+    private RemotePeerStub routeToClosestNeighbor(Point randomPoint) throws RemoteException, NotBoundException, UnknownHostException {
         SortedMap<Float, RemotePeerStub> proximity = new TreeMap<Float, RemotePeerStub>();
         for (RemotePeerStub neighbor : neighbors) {
             proximity.put(neighbor.calculateProximityTo(randomPoint), neighbor);
         }
         RemotePeerStub closestNeighbor = proximity.get(proximity.firstKey());
+        log("Routed to " + closestNeighbor.ip());
         return closestNeighbor.route(randomPoint);
     }
 
@@ -326,6 +322,15 @@ public class Peer implements RemotePeerStub {
             return "FAILURE";
         }
 
+    }
+
+
+    private void log(String msg) throws RemoteException, UnknownHostException, NotBoundException {
+        logger.log(msg);
+    }
+
+    public void setLogger(RemoteLoggerStub logger) {
+        this.logger = logger;
     }
 }
 

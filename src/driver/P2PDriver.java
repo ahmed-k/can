@@ -1,14 +1,18 @@
 package driver;
 
 import debris.Command;
+import debris.Logger;
 import geometry.Point;
 import rmi.Network;
+import rmi.RemoteLoggerStub;
 import rmi.RemotePeerStub;
 
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -23,13 +27,16 @@ public class P2PDriver {
 
     public static Scanner scanner = new Scanner(System.in);
     public static Registry rmi;
-    public static void main(String[] args) throws RemoteException, NotBoundException, UnknownHostException {
+    public static RemoteLoggerStub logger;
+    public static void main(String[] args) throws RemoteException, NotBoundException, UnknownHostException, AlreadyBoundException {
 
 
         try {
             rmi = Network.getRegistry();
-        } catch (RemoteException e) {
-            e.printStackTrace();
+            logger = Network.getLogger();
+        } catch (Exception e) {
+            System.out.println("Failure to initiate registry...exiting...");
+            System.exit(1);
         }
         System.out.println("You have connected to the P2P network..");
 
@@ -112,6 +119,9 @@ public class P2PDriver {
                         }
                     }
                 }
+                catch(RemoteException ex) {
+                    System.out.println("Failure");
+                }
                 catch(IllegalArgumentException ex) {
                     System.out.println("Not a valid command...");
                 }
@@ -143,15 +153,14 @@ public class P2PDriver {
     private static void leave(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
         System.out.println("Executing LEAVE request...");
         RemotePeerStub peer = getPeer(peerId);
-        String log = peer.leave();
+        peer.leave();
         RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
         bootstrap.removeOnlineNode(peer);
-        System.out.println(log);
 
     }
 
     private static void join(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
-        System.out.println("Executing JOIN request...");
+        //System.out.println("Executing JOIN request...");
         RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
 
             RemotePeerStub peer = null;
@@ -160,6 +169,7 @@ public class P2PDriver {
         }
         //node not active
         catch(RemoteException e) {
+            System.out.println("Failure");
             return;
         }
 
@@ -199,12 +209,12 @@ public class P2PDriver {
     }
 
     private static void insert(String keyword, String peerId) throws RemoteException, NotBoundException, UnknownHostException {
-        System.out.println("Executing INSERT request...");
+        //System.out.println("Executing INSERT request...");
         Point insertionPoint = resolve(keyword);
-        System.out.println(keyword + " resolved as " + insertionPoint);
+        //System.out.println(keyword + " resolved as " + insertionPoint);
         RemotePeerStub peer = getPeer(peerId);
         peer.insert(insertionPoint, keyword);
-
+        System.out.println(logger.deliverLog());
     }
 
 
@@ -235,6 +245,11 @@ public class P2PDriver {
         int index = r.nextInt(nodes.size());
         return nodes.get(index);
 
+    }
+
+    private static void registerLogger(Logger logger) throws RemoteException, AlreadyBoundException {
+        RemoteLoggerStub _logger = (RemoteLoggerStub) UnicastRemoteObject.exportObject(logger, 1077);
+        rmi.bind("logger", logger);
     }
 
 
