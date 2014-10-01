@@ -116,7 +116,7 @@ public class Peer implements RemotePeerStub {
 
     private List<RemotePeerStub> addNeighborsToNewPeer(CoordinateZone oldZone, CoordinateZone newZone) throws RemoteException {
         List<RemotePeerStub> transitioningNeighbors = new ArrayList<RemotePeerStub>();
-        neighbors.addAll(removeDepartingNeighborsNotTouching(oldZone));
+        transitioningNeighbors.addAll(removeDepartingNeighborsNotTouching(oldZone));
         //remove them from this peer's neighbors
         for (RemotePeerStub neighbor : transitioningNeighbors) {
             this.neighbors.remove(neighbor);
