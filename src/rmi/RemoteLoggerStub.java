@@ -9,6 +9,5 @@ import java.rmi.RemoteException;
 public interface RemoteLoggerStub extends Remote {
 
     void log(String msg) throws RemoteException;
-
-    String deliverLog();
+    String deliverLog() throws RemoteException;
 }
