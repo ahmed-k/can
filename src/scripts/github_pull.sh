@@ -16,6 +16,13 @@ curl $URL/driver/PeerLoader.java > driver/PeerLoader.java
 curl $URL/debris/Command.java > debris/Command.java
 curl $URL/debris/Constants.java > debris/Constants.java
 curl $URL/debris/Logger.java > debris/Logger.java
+curl $URL/scripts/github_pull.sh > scripts/github_pull.sh
+curl $URL/scripts/compile.sh > scripts/compile.sh
+curl $URL/scripts/run.sh > scripts/run.sh
+curl $URL/scripts/connectPeer.sh > scripts/connectPeer.sh
+curl $URL/test/CoordinateZoneTests.java > test/CoordinateZoneTests.java
+curl $URL/test/RmiTests.java > test/RmiTests.java
+curl $URL/README.txt > README.txt
 javac *.java
 javac peer/*.java
 javac geometry/*.java
