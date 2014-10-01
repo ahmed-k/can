@@ -11,13 +11,11 @@ public class Logger implements RemoteLoggerStub {
 
     private static String content="";
     private static Logger instance;
-    private static int i;
 
 
 
     private Logger() {
         content="";
-        i=0;
     }
 
 
@@ -41,7 +39,6 @@ public class Logger implements RemoteLoggerStub {
 
     @Override
     public void log(String msg) throws RemoteException {
-        content += i+"." + msg+"\n";
-        i++;
+        content += msg+"\n";
     }
 }

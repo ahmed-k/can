@@ -13,7 +13,7 @@ public class Point implements Serializable{
         float x2 = point.getX();
         float y2 = point.getY();
         float distance = (float) Math.sqrt((x2-x)*(x2-x) + (y2-y)*(y2-y));
-        System.out.println("Distance is "  + distance);
+        //System.out.println("Distance is "  + distance);
         return distance;
 
 

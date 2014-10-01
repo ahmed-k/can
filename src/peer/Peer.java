@@ -180,11 +180,10 @@ public class Peer implements RemotePeerStub {
 
         if (zone.hasPoint(insertionPoint)) {
             //System.out.println("keyword " + keyword + " stored in " + name);
-            log("Keyword" + keyword + " stored in peer " + name + "at IP address " + ip);
+            log("Keyword " + keyword + " stored in peer " + name + " at IP address " + ip);
             hashtable.put(keyword, "file represented by " + keyword);
         } else {
             RemotePeerStub closest = routeToClosestNeighbor(insertionPoint);
-            log(" Keyword stored at peer " + closest.desc() + "with IP address " + closest.ip());
             closest.insert(insertionPoint, keyword);
         }
 
@@ -201,7 +200,7 @@ public class Peer implements RemotePeerStub {
             log("Found at peer " + name + " with IP " + ip);
         } else {
             RemotePeerStub closest = routeToClosestNeighbor(insertionPoint);
-            log(" Routed to peer " + closest.desc() + "with IP address" + closest.ip());
+            log(" Routed to peer " + closest.desc() + " with IP address " + closest.ip());
             closest.search(insertionPoint, keyword);
         }
     }
@@ -213,11 +212,12 @@ public class Peer implements RemotePeerStub {
 
     @Override
     public void leave() throws RemoteException, NotBoundException, UnknownHostException {
+        logger.log("Peers affected by leave operation:");
         SortedMap<Float, RemotePeerStub> size = new TreeMap<Float, RemotePeerStub>();
         for (RemotePeerStub neighbor : neighbors) {
             if (neighbor.willMergeUniformly(zone)) {
                 merge(neighbor);
-                log("Successfully merged with" + neighbor.desc());
+                log("Successfully merged with " + neighbor.desc());
 
             } else {
                 size.put(neighbor.zoneSize(), neighbor);
@@ -225,7 +225,7 @@ public class Peer implements RemotePeerStub {
         }
         RemotePeerStub smallest = size.get(size.firstKey());
         merge(smallest);
-       log("Successfully merged with" + smallest.desc());
+       log("Successfully merged with " + smallest.desc());
 
 
 
@@ -235,6 +235,7 @@ public class Peer implements RemotePeerStub {
         neighbor.own(zone, hashtable, neighbors);
         for (RemotePeerStub n: neighbors) {
             n.notifyDeparture(stub);
+            logger.log(n.info());
         }
         zone = null;
         neighbors.clear();
@@ -257,6 +258,7 @@ public class Peer implements RemotePeerStub {
         this.zone.merge(zone);
         this.hashtable.putAll(hashtable);
         mergeNeighbors(neighbors);
+        logger.log(info());
     }
 
     public void shakeHands(RemotePeerStub newNeighbor) throws RemoteException {
@@ -294,7 +296,7 @@ public class Peer implements RemotePeerStub {
             proximity.put(neighbor.calculateProximityTo(randomPoint), neighbor);
         }
         RemotePeerStub closestNeighbor = proximity.get(proximity.firstKey());
-        log("Routed to " + closestNeighbor.ip());
+        log("Routed to " + closestNeighbor.desc() + " ("+closestNeighbor.ip()+")");
         return closestNeighbor.route(randomPoint);
     }
 

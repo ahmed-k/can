@@ -1,7 +1,6 @@
 package driver;
 
 import debris.Command;
-import debris.Logger;
 import geometry.Point;
 import rmi.Network;
 import rmi.RemoteLoggerStub;
@@ -12,7 +11,6 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -108,7 +106,7 @@ public class P2PDriver {
                             }
 
                             else {
-                                for (int i=2; i<21; i++) {
+                                for (int i=1; i<21; i++) {
                                   join("compute-0-"+i);
                                 }
                             }
@@ -121,6 +119,7 @@ public class P2PDriver {
                 }
                 catch(RemoteException ex) {
                     System.out.println("Failure");
+                    logger.deliverLog();
                 }
                 catch(IllegalArgumentException ex) {
                     System.out.println("Not a valid command...");
@@ -151,11 +150,12 @@ public class P2PDriver {
     }
 
     private static void leave(String peerId) throws RemoteException, NotBoundException, UnknownHostException {
-        System.out.println("Executing LEAVE request...");
+        //System.out.println("Executing LEAVE request...");
         RemotePeerStub peer = getPeer(peerId);
         peer.leave();
         RemotePeerStub bootstrap = getPeer(BOOTSTRAP);
         bootstrap.removeOnlineNode(peer);
+        System.out.println(logger.deliverLog());
 
     }
 
@@ -170,6 +170,7 @@ public class P2PDriver {
         //node not active
         catch(RemoteException e) {
             System.out.println("Failure");
+            logger.deliverLog();
             return;
         }
 
@@ -186,12 +187,14 @@ public class P2PDriver {
             }
             if (!alreadyJoined) {
                 Point randomPoint = peer.pickRandomPoint();
-                System.out.println("Picked random point: " + randomPoint);
+                //System.out.println("Picked random point: " + randomPoint);
                 RemotePeerStub router = pickRandomOnlineNode(onlineNodes);
-                System.out.println("Picked random online node: " + router.desc());
+                //System.out.println("Picked random online node: " + router.desc());
                 RemotePeerStub pointOwnerPeer = router.route(randomPoint);
                 pointOwnerPeer.accomodate(peer, randomPoint);
                 bootstrap.addOnlineNode(peer);
+                System.out.println("New Node\n" + peer.info());
+
             }
 
 
@@ -201,10 +204,11 @@ public class P2PDriver {
 
 
     private static void search(String keyword, String peerId) throws RemoteException, NotBoundException, UnknownHostException {
-        System.out.println("Executing SEARCH request...");
+        //System.out.println("Executing SEARCH request...");
         Point insertionPoint = resolve(keyword);
         RemotePeerStub peer = getPeer(peerId);
         peer.search(insertionPoint, keyword);
+        System.out.println(logger.deliverLog());
 
     }
 
@@ -247,10 +251,7 @@ public class P2PDriver {
 
     }
 
-    private static void registerLogger(Logger logger) throws RemoteException, AlreadyBoundException {
-        RemoteLoggerStub _logger = (RemoteLoggerStub) UnicastRemoteObject.exportObject(logger, 1077);
-        rmi.bind("logger", logger);
-    }
+
 
 
 }
