@@ -93,9 +93,9 @@ public class Peer implements RemotePeerStub {
         //System.out.println("zone split and now has dimensions: " + zone);
         //System.out.println("new zone has dimensions" + newZone);
         List<RemotePeerStub> newZoneNeighbors = addNeighborsToNewPeer(zone, newZone);
-        this.shakeHands(peer);
         peer.setLogger(logger);
         peer.accept(newZone, newZoneNeighbors);
+        this.shakeHands(peer);
         //System.out.println("node " + name + " has neighbors: " + neighbors());
 
 
