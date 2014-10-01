@@ -31,7 +31,7 @@ public class Logger implements RemoteLoggerStub {
     }
 
 
-    public String deliverLog() {
+    public String deliverLog() throws RemoteException {
         String retVal = content;
         content = "";
         return retVal;
